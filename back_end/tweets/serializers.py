@@ -6,7 +6,7 @@ class TweetSerializer(ModelSerializer):
         model = Tweet
         fields = '__all__'
         extra_kwargs = {
-            'user':{'required':True},
+            'user':{'required':False},
             'tweet_replied_to':{'required':False},
             'time':{'read_only':True},
             'edit_time':{'read_only':True},
@@ -28,7 +28,7 @@ class BookmarkSerializer(ModelSerializer):
         model = Bookmark
         fields = '__all__'
         extra_kwargs = {
-            'user':{'required':True}
+            'user':{'required':False}
         }
 
     def validate(self, attrs):
@@ -40,7 +40,7 @@ class LikeSerializer(ModelSerializer):
         model = Like
         fields = '__all__'
         extra_kwargs = {
-            'user':{'required':True}
+            'user':{'required':False}
         }
 
     def validate(self, attrs):

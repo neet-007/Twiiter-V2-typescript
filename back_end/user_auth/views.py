@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import UserProfile
 from .serializers import UserProfileSerlializer
+from traceback import print_exc
 # Create your views here.
 user_model = get_user_model()
 
@@ -30,6 +31,7 @@ class Register(APIView):
         try:
             user_model.objects.create_user(email=data['email'], password=data['password'])
         except:
+            print_exc()
             return Response({'error':'some error occurued please try later'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         return Response({'success':'user created'}, status=status.HTTP_201_CREATED)
@@ -57,6 +59,7 @@ class Logout(APIView):
         try:
             logout(request)
         except:
+            print_exc()
             return Response({'error':'some error occured please try later'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'success':'user logged out'}, status=status.HTTP_200_OK)
@@ -69,3 +72,9 @@ class GetCSRFToken(APIView):
 class UserProfileViewset(ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerlializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user'] = self.request.user
+
+        return context

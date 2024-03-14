@@ -6,6 +6,7 @@ user_model = get_user_model()
 
 class FollowsManager(models.Manager):
     def create(self, following:int, follower:int) -> 'Follows':
+        """"
         try:
             following_=UserProfile.objects.get(pk=following)
         except UserProfile.DoesNotExist:
@@ -15,17 +16,17 @@ class FollowsManager(models.Manager):
             follower_=UserProfile.objects.get(pk=follower)
         except UserProfile.DoesNotExist:
             raise ValueError('follower user does not exist')
-
-        follow = Follows(following=following_, follower=follower_)
+        """
+        follow = Follows(following=following, follower=follower)
         follow.save()
 
-        follower_.following += 1
-        following_.following += 1
-        follower_.save()
-        following_.save()
+        follower.follower += 1
+        following.following += 1
+        follower.save()
+        following.save()
 
         return follow
 
 class Follows(models.Model):
-    following = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name='follows_following')
-    follower = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name='follows_followers')
+    following = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='follows_following')
+    follower = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='follows_followers')

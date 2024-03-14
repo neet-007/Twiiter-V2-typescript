@@ -1,14 +1,27 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth import get_user_model
+from traceback import print_exc
 # Create your models here.
 user_model = get_user_model()
 
 class TweetManager(models.Manager):
     def create_tweet(self, user:AbstractBaseUser, text:str, tweet_replied_to:int=None) -> 'Tweet':
         if tweet_replied_to:
-            return self.create(user, text, tweet_replied_to, is_reply=True)
-        return self.create(user, text, is_reply=False)
+            """
+            try:
+                tweet_replied_to_ = Tweet.objects.get(pk=tweet_replied_to)
+            except Tweet.DoesNotExist:
+                print_exc()
+                raise Exception('error occured when creating tweet')
+            """
+            tweet = Tweet(user=user, text=text, tweet_replied_to=tweet_replied_to, is_reply=True)
+            tweet.save()
+            return tweet
+
+        tweet = Tweet(user=user, text=text, is_reply=False)
+        tweet.save()
+        return tweet
 
 class Tweet(models.Model):
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
@@ -25,12 +38,13 @@ class Tweet(models.Model):
 
 class BookmarkManager(models.Manager):
     def create(self, user:AbstractBaseUser, tweet:int) -> 'Bookmark':
+        """
         try:
             tweet_ = Tweet.objects.get(pk=tweet)
         except Tweet.DoesNotExist:
             raise ValueError('tweet does not exist')
-
-        bookmark = Bookmark(user=user, tweet=tweet_)
+        """
+        bookmark = Bookmark(user=user, tweet=tweet)
         bookmark.save()
 
         return bookmark
@@ -49,12 +63,13 @@ class Bookmark(models.Model):
 
 class LikeManager(models.Manager):
     def create(self, user:AbstractBaseUser, tweet:int) -> 'Like':
+        """
         try:
             tweet_ = Tweet.objects.get(pk=tweet)
         except Tweet.DoesNotExist:
             raise ValueError('tweet does not exist')
-
-        like = Like(user=user, tweet=tweet_)
+        """
+        like = Like(user=user, tweet=tweet)
         like.save()
 
         return like
