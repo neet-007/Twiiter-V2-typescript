@@ -1,5 +1,9 @@
+from typing import Any
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from .utils import mail_user
+from uuid import uuid4
+
 
 # Create your models here.
 class UserManager(BaseUserManager):
@@ -46,4 +50,27 @@ class UserProfile(models.Model):
     bio = models.CharField(max_length=225, blank=True, null=True)
     followers = models.PositiveIntegerField(default=0)
     following = models.PositiveIntegerField(default=0)
-    join_data = models.DateField()
+    join_data = models.DateField(auto_now_add=True)
+
+class VerificationTokensManager(models.Manager):
+    def create(self, user:UserModel, token:uuid4) -> 'VerificationTokens':
+        token_ = VerificationTokens(user=user, token=token)
+
+        mail_user(subject='verify your email', body='', to=[user.email])
+
+        token_.save()
+        return token_
+
+    def check_user_token(self, user:UserModel, token:uuid4) -> None:
+        try:
+            token_ = self.get(user=user, token=token)
+        except VerificationTokens.DoesNotExist:
+            return False
+
+        token_.delete()
+
+        return True
+
+class VerificationTokens(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid4)

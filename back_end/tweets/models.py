@@ -1,6 +1,4 @@
-from typing import Any, Iterable
 from django.db import models
-from datetime import datetime
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth import get_user_model
 # Create your models here.
@@ -16,8 +14,8 @@ class Tweet(models.Model):
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
     tweet_replied_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     text = models.TextField(max_length=225)
-    time = models.DateTimeField(blank=True)
-    edit_time = models.DateTimeField(blank=True, null=True)
+    time = models.DateTimeField(blank=True, auto_now_add=True)
+    edit_time = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     likes = models.PositiveIntegerField(default=0, blank=True)
     relpies = models.PositiveIntegerField(default=0, blank=True)
     bookmarks = models.PositiveIntegerField(default=0, blank=True)
@@ -44,7 +42,7 @@ class Bookmark(models.Model):
     objects = BookmarkManager()
 
     def save(self, *args, **kwargs) -> None:
-        self.tweet.likes += 1
+        self.tweet.bookmarks += 1
         self.tweet.save()
         return super().save(*args, **kwargs)
 
