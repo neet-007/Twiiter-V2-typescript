@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.utils.decorators import method_decorator

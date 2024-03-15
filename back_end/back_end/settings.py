@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-r#lbn-=qz=e9cavtmas69cn5_uhpepls%_sb%qzzf-4xu+ngm!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://localhost:5173', '127.0.0.1']
 
 
 # Application definition
@@ -117,6 +117,13 @@ USE_I18N = True
 USE_TZ = True
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'mytwitterappv1@gmail.com'
+EMAIL_HOST_PASSWORD = 'tsfddjnhlxwaqwhc'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -126,5 +133,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:5173',]
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173',]
 
 AUTH_USER_MODEL  = 'user_auth.UserModel'

@@ -52,9 +52,13 @@ class UserProfile(models.Model):
     following = models.PositiveIntegerField(default=0)
     join_data = models.DateField(auto_now_add=True)
 
+    def save(self, *args, **kwargs) -> None:
+        VerificationTokens.objects.create(user=self.user)
+        return super().save(*args, **kwargs)
+
 class VerificationTokensManager(models.Manager):
-    def create(self, user:UserModel, token:uuid4) -> 'VerificationTokens':
-        token_ = VerificationTokens(user=user, token=token)
+    def create(self, user:UserModel) -> 'VerificationTokens':
+        token_ = VerificationTokens(user=user)
 
         mail_user(subject='verify your email', body='', to=[user.email])
 
@@ -73,4 +77,6 @@ class VerificationTokensManager(models.Manager):
 
 class VerificationTokens(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    token = models.UUIDField(default=uuid4)
+    token = models.UUIDField(default=uuid4, blank=True)
+
+    objects = VerificationTokensManager()
