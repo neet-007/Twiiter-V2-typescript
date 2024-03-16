@@ -3,6 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -73,6 +74,13 @@ class GetCSRFToken(APIView):
 class UserProfileViewset(ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerlializer
+
+    @action(methods=['get'], detail=False)
+    def check_user(self, request):
+        if request.user == AnonymousUser:
+            return Response({'error':'user not found'}, status=status.HTTP_200_OK)
+        print(request.user.userprofile_set.all())
+        return Response({'success':UserProfileSerlializer(request.user.userprofile_set.all()[0]).data}, status=status.HTTP_200_OK)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

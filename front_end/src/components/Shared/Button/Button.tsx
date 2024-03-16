@@ -7,8 +7,10 @@ interface ButtonProps extends ComponentProps<'button'>{
 
 export const Button:React.FC<ButtonProps> = ({variant, clr, children, ...props}) => {
   return (
-    <button className={`flex p-2 bg-${variant?`${variant.clrName}-${variant.shade}`:'sky-400'} justify-center align-middle rounded-full`} {...props}>
+    <button className={`flex py-2 px-4 bg-sky-400 justify-center items-center rounded-full`} {...props}>
         {children}
     </button>
   )
 }
+
+//${variant?`${variant.clrName}-${variant.shade}`:'sky-400'}

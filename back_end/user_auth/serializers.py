@@ -1,12 +1,17 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
 from .models import UserModel, UserProfile
 
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ['pk', 'email_verified']
+
 class UserProfileSerlializer(ModelSerializer):
+    user = UserSerializer(required=False)
     class Meta:
         model = UserProfile
         fields = '__all__'
         extra_kwargs = {
-            'user':{'required':False},
             'bio':{'required':False},
             'followers':{'required':False},
             'following':{'required':False},
