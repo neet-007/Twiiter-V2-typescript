@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth import get_user_model
@@ -30,14 +31,14 @@ class Tweet(models.Model):
     time = models.DateTimeField(blank=True, auto_now_add=True)
     edit_time = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     likes = models.PositiveIntegerField(default=0, blank=True)
-    relpies = models.PositiveIntegerField(default=0, blank=True)
+    replies = models.PositiveIntegerField(default=0, blank=True)
     bookmarks = models.PositiveIntegerField(default=0, blank=True)
     is_reply = models.BooleanField(default=False)
 
     objects = TweetManager()
 
 class BookmarkManager(models.Manager):
-    def create(self, user:AbstractBaseUser, tweet:int) -> 'Bookmark':
+    def create(self, user:AbstractBaseUser, tweet:Tweet) -> 'Bookmark':
         """
         try:
             tweet_ = Tweet.objects.get(pk=tweet)
@@ -60,9 +61,14 @@ class Bookmark(models.Model):
         self.tweet.save()
         return super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
+        if self.tweet.bookmarks > 0:
+            self.tweet.bookmarks -= 1
+            self.tweet.save()
+        return super().delete(*args, **kwargs)
 
 class LikeManager(models.Manager):
-    def create(self, user:AbstractBaseUser, tweet:int) -> 'Like':
+    def create(self, user:AbstractBaseUser, tweet:Tweet) -> 'Like':
         """
         try:
             tweet_ = Tweet.objects.get(pk=tweet)
@@ -84,3 +90,9 @@ class Like(models.Model):
         self.tweet.likes += 1
         self.tweet.save()
         return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
+        if self.tweet.likes > 0:
+            self.tweet.likes -=1
+            self.tweet.save()
+        return super().delete(*args, **kwargs)

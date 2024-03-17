@@ -1,18 +1,22 @@
-import React, { ComponentProps, useEffect } from 'react'
+import React, { ComponentProps, useState } from 'react'
 import { Button } from '../../components/Shared/Button/Button'
 import { SectionSelector } from '../../components/Shared/SectionSelector/SectionSelector'
-import { TweetCard } from '../../components/Shared/TweetCard/TweetCard'
-import {CSRF} from '../../components/Shared/CSRFToken/CSRFToken'
-import { getCSFRToken } from '../../lib/Axios'
+import { Tweet, TweetCard } from '../../components/Shared/TweetCard/TweetCard'
+import { useGetUserProfile } from '../../lib/ReactQuery'
+import { useParams } from 'react-router-dom'
 
 export const UserDetailsPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
-  useEffect(() => {
-    getCSFRToken()
-      
-  },[])
+  const {userId} = useParams()
+  const [page, setPage] = useState<number>(1)
+  const {data, isLoading, isError, error} = useGetUserProfile({userId:Number(userId), page})
+
+  if(isLoading) return <h1>loading...</h1>
+  if(isError){
+    console.error(error)
+    return <h1>error</h1>
+  }
   return (
     <section {...props}>
-      <CSRF/>
       <div>
         <div>header</div>
         <div className='flex justify-between'>
@@ -20,20 +24,23 @@ export const UserDetailsPage:React.FC<ComponentProps<'section'>> = ({...props}) 
           <Button>follow</Button>
         </div>
         <div>
-          <p>username</p>
-          <p>mention</p>
+          <p>{data?.success.user.user_name}</p>
+          <p>{data?.success.user.mention}</p>
         </div>
-        <p>bio</p>
+        <p>{data?.success.user.bio}</p>
         <div className='flex gap-2'>
           <p>locaiotns</p>
-          <p>jin date</p>
+          <p>{data?.success.user.join_date}</p>
         </div>
         <div className='flex gap-2'>
-          <p>followers</p>
-          <p>following</p>
+          <p>followers:{data?.success.user.followers}</p>
+          <p>following:{data?.success.user.following}</p>
         </div>
       </div>
       <SectionSelector buttonsArray={['posts', 'replies', 'media', 'likes']} sectionClick={() => {}}/>
+      {data?.success.results.map((tweet:Tweet) => {
+        return <TweetCard key={tweet.id} tweet={tweet}/>
+      })}
     </section>
   )
 }

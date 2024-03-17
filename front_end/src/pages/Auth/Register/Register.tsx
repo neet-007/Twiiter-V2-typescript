@@ -7,7 +7,8 @@ export const Register:React.FC<ComponentProps<'section'>> = () => {
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const rePasswordRef = useRef<HTMLInputElement>(null)
-    function handleSubmit(){
+    function handleSubmit(e:React.FormEvent<HTMLFormElement>){
+        e.preventDefault()
         if (emailRef.current && passwordRef.current && rePasswordRef.current)
         register({email:emailRef.current?.value, password:passwordRef.current?.value, rePassword:passwordRef.current?.value})
     }

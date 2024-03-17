@@ -8,6 +8,7 @@ import { ListPage } from "./pages/ListPage/ListPage"
 import { Register } from "./pages/Auth/Register/Register"
 import { Login } from "./pages/Auth/Login/Login"
 import { MakeProfile } from "./pages/Auth/MakeProfile/MakeProfile"
+import { BottomBar } from "./components/Mobile/BottomBar"
 
 function App() {
 
@@ -17,12 +18,13 @@ function App() {
         <Route path="" element={<MainPage/>}/>
         <Route path="search" element={<SearchPage/>}/>
         <Route path="notification" element={<NotificationsPage/>}/>
-        <Route path="profile" element={<UserDetailsPage/>}/>
+        <Route path="profile/:userId" element={<UserDetailsPage/>}/>
         <Route path="list" element={<ListPage/>}/>
           <Route path="auth/register" element={<Register/>}/>
           <Route path="auth/login" element={<Login/>}/>
           <Route path="auth/make-profile" element={<MakeProfile/>}/>
       </Routes>
+      <BottomBar/>
     </main>
   )
 }

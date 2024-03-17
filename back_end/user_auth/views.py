@@ -77,7 +77,8 @@ class UserProfileViewset(ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def check_user(self, request):
-        if request.user == AnonymousUser:
+
+        if isinstance(request.user, AnonymousUser):
             return Response({'error':'user not found'}, status=status.HTTP_200_OK)
         print(request.user.userprofile_set.all())
         return Response({'success':UserProfileSerlializer(request.user.userprofile_set.all()[0]).data}, status=status.HTTP_200_OK)
