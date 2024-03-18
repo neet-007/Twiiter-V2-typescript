@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/auth/', include('user_auth.urls')),
     path('api/following/', include('following.urls')),
     path('api/tweets/', include('tweets.urls')),
+    path('api/lists/', include('lists.urls'))
 ]
