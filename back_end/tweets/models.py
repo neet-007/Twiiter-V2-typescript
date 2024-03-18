@@ -2,6 +2,7 @@ from typing import Any
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth import get_user_model
+from user_auth.models import UserProfile
 from traceback import print_exc
 # Create your models here.
 user_model = get_user_model()
@@ -25,7 +26,7 @@ class TweetManager(models.Manager):
         return tweet
 
 class Tweet(models.Model):
-    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     tweet_replied_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     text = models.TextField(max_length=225)
     time = models.DateTimeField(blank=True, auto_now_add=True)

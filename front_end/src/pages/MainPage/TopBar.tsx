@@ -3,6 +3,8 @@ import { SectionSelector } from '../../components/Shared/SectionSelector/Section
 import { ProfileIcon } from '../../components/Shared/ProfileIcon/ProfileIcon'
 import { Gear, TwitterX } from 'react-bootstrap-icons'
 
+
+
 export const TopBar:React.FC<ComponentProps<'div'>> = () => {
   return (
     <div>

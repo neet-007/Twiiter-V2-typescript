@@ -15,6 +15,10 @@ interface ContextType{
     setUser:React.Dispatch<React.SetStateAction<any>>
     isAuthenticated:boolean
     setIsAuthenticated:React.Dispatch<React.SetStateAction<any>>
+    isLoading:boolean
+    setIsLoading:React.Dispatch<React.SetStateAction<any>>
+    hasProfile:boolean
+    setHasProfile:React.Dispatch<React.SetStateAction<any>>
     checkUser:() => void
 }
 
@@ -23,6 +27,10 @@ const INITAIL_STATE = {
     setUser:() => {},
     isAuthenticated:false,
     setIsAuthenticated:() => {},
+    isLoading:true,
+    setIsLoading:() => {},
+    hasProfile:false,
+    setHasProfile:() => {},
     checkUser:() => {}
 }
 
@@ -33,13 +41,24 @@ export const UserContextProvider:React.FC<ComponentProps<'div'>> = ({children}) 
 
     const [user, setUser] = useState<typeof INITAIL_USER>(INITAIL_USER)
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [hasProfile, setHasProfile] = useState<boolean>(false)
 
     function checkUser(){
         getCheckUser()
             .then(res => {
-                if ('success' in res)
-                setUser(res.success)
-                setIsAuthenticated(true)
+                if ('error' in res) return
+                if(!res.success.profile){
+                    setHasProfile(false)
+                    setIsAuthenticated(true)
+                    setIsLoading(false)
+                }
+                else{
+                    setUser(res.success.profile)
+                    setHasProfile(true)
+                    setIsAuthenticated(true)
+                    setIsLoading(false)
+                }
             })
     }
 
@@ -48,11 +67,15 @@ export const UserContextProvider:React.FC<ComponentProps<'div'>> = ({children}) 
     },[])
 
     const value = {
-        user:user,
-        setUser:setUser,
-        isAuthenticated:isAuthenticated,
-        setIsAuthenticated:setIsAuthenticated,
-        checkUser:checkUser
+        user,
+        setUser,
+        isAuthenticated,
+        setIsAuthenticated,
+        isLoading,
+        setIsLoading,
+        hasProfile,
+        setHasProfile,
+        checkUser
     }
     return(
         <UserContext.Provider value={value}>

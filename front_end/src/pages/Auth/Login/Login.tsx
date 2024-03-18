@@ -1,4 +1,4 @@
-import React, { ComponentProps, useRef } from 'react'
+import React, { ComponentProps, useEffect, useRef } from 'react'
 import { useLogin } from '../../../lib/ReactQuery'
 import { Button } from '../../../components/Shared/Button/Button'
 import { useNavigate } from 'react-router-dom'
@@ -14,8 +14,11 @@ export const Login:React.FC<ComponentProps<'section'>> = () => {
 
    const navigate = useNavigate()
 
-    if(isAuthenticated) navigate('/')
-    if(data?.success) navigate('/')
+   useEffect(() => {
+       if(isAuthenticated) navigate('/')
+       if(data?.success) navigate('/')
+   },[isAuthenticated, data])
+
    function handleSubmit(e:React.FormEvent<HTMLFormElement>){
         e.preventDefault()
        console.log(emailRef.current?.value)

@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import UserProfile
-from .serializers import UserProfileSerlializer
+from .serializers import UserProfileSerlializer, UserSerializer
 from traceback import print_exc
 # Create your views here.
 user_model = get_user_model()
@@ -77,11 +77,13 @@ class UserProfileViewset(ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def check_user(self, request):
-
         if isinstance(request.user, AnonymousUser):
             return Response({'error':'user not found'}, status=status.HTTP_200_OK)
-        print(request.user.userprofile_set.all())
-        return Response({'success':UserProfileSerlializer(request.user.userprofile_set.all()[0]).data}, status=status.HTTP_200_OK)
+        try:
+            profile = UserProfileSerlializer(request.user.userprofile_set.all()[0]).data
+        except IndexError:
+            profile = None
+        return Response({'success':{'user':UserSerializer(request.user).data,'profile':profile}}, status=status.HTTP_200_OK)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

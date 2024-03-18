@@ -57,7 +57,7 @@ export async function login({email, password}:{email:string, password:string}) {
 
 export async function makeProfile({userName, mention, bio, img}:{userName:string, mention:string, bio:string, img?:string}) {
     try {
-        let res = await axios.post('/api/auth/user-profile', {user_name:userName, mention, bio}, config)
+        let res = await axios.post('/api/auth/user-profile/', {user_name:userName, mention, bio}, config)
         console.log(res.data)
         return res.data
     } catch (error) {
@@ -98,7 +98,7 @@ export async function GetMainPageTweets(){
 
 export async function getUserProfile({userId, page=1}:{userId?:number, page:number}) {
     try {
-        let res = await axios.get(`/api/tweets/tweet/get_user_profile?page=${page}&${userId ? `user_id=${userId}`: ''}/`)
+        let res = await axios.get(`/api/tweets/tweet/get_user_profile?page=${page}&${userId ? `user-id=${userId}`: ''}/`)
         console.log(res.data)
         return res.data
     } catch (error) {

@@ -1,16 +1,37 @@
-import React, { ComponentProps, useRef } from 'react'
-import { useRegister } from '../../../lib/ReactQuery'
+import React, { ComponentProps, useEffect, useRef } from 'react'
+import { useLogin, useRegister } from '../../../lib/ReactQuery'
 import { Button } from '../../../components/Shared/Button/Button'
-
+import { useUserContext } from '../../../context/UserContext'
+import { useNavigate } from 'react-router-dom'
+ 
 export const Register:React.FC<ComponentProps<'section'>> = () => {
-   const {mutateAsync:register} = useRegister()
+    const navigate = useNavigate()
+    const {isAuthenticated, checkUser} = useUserContext()
+    const {mutateAsync:register} = useRegister()
+    const {mutateAsync:login} = useLogin()
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const rePasswordRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if(isAuthenticated) navigate('/')
+    },[isAuthenticated])
+
     function handleSubmit(e:React.FormEvent<HTMLFormElement>){
         e.preventDefault()
         if (emailRef.current && passwordRef.current && rePasswordRef.current)
         register({email:emailRef.current?.value, password:passwordRef.current?.value, rePassword:passwordRef.current?.value})
+        .then(res => {
+            if('error' in res) return console.log(res.error)
+            if(emailRef.current && passwordRef.current){
+                login({email:emailRef.current.value, password:passwordRef.current.value})
+                .then(res => {
+                    if('error' in res) return console.log(res.error)
+                    checkUser()
+                    navigate('/auth/make-profile')
+                })
+            }
+        })
     }
 return (
     <section>

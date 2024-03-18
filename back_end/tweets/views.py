@@ -19,10 +19,13 @@ class TweetViewset(ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_user_profile(self, request):
         page = request.GET.get('page', 1)
-        user = request.GET.get('user-id', request.user.pk)
-
+        user_id = request.GET.get('user-id', request.user.pk)
         try:
-            user_ = user_model.objects.get(pk=user)
+            user = user_model.objects.get(pk=user_id.replace('/',''))
+        except:
+            return Response({'error':'user does not existsss'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            user_ = UserProfile.objects.get(user=user)
         except:
             return Response({'error':'user not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -36,15 +39,19 @@ class TweetViewset(ModelViewSet):
         if page_obj.has_previous():
             return_dict['previous'] = page_obj.previous_page_number()
 
-        return_dict['user'] = UserProfileSerlializer(user_.userprofile_set.all()[0]).data
+        return_dict['user'] = UserProfileSerlializer(user_).data
         return_dict['results'] = TweetSerializer(page_obj.object_list, many=True).data
 
         return Response({'success':return_dict}, status=status.HTTP_200_OK)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['user'] = self.request.user
-
+        if self.request.method != 'GET':
+            try:
+                context['user'] = UserProfile.objects.get(user=self.request.user)
+            except UserProfile.DoesNotExist:
+                return Response({'error':'user does not have profile'}, status=status.HTTP_400_BAD_REQUEST)
+        context['method'] = self.request.method
         return context
 
 class BookmarkViewset(ModelViewSet):

@@ -17,7 +17,8 @@ class TweetSerializer(ModelSerializer):
         }
 
     def validate(self, attrs):
-        attrs['user'] = self.context.get('user')
+        if self.context.get('method') != 'GET':
+            attrs['user'] = self.context.get('user')
         return super().validate(attrs)
 
     def create(self, validated_data):
