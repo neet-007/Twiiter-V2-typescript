@@ -10,38 +10,38 @@ class ListViewset(ModelViewSet):
     queryset = List.objects.all()
     serializer_class = ListSerializer
 
-    @action(methods=['patch'], detail=False)
+    @action(methods=['post'], detail=False)
     def follow(self, request):
         if isinstance(request.user, AnonymousUser):
             return Response({'error':'user is not authintecated'}, status=status.HTTP_401_UNAUTHORIZED)
-        serialized_data = ListSerializer(request.data)
+        serialized_data = ListSerializer(data=request.data, context={'user':request.user.pk})
         if serialized_data.is_valid():
-            return serialized_data.follow(**serialized_data.validated_data)
+            return Response({'success':ListSerializer(serialized_data.follow(serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['patch'], detail=False)
+    @action(methods=['post'], detail=False)
     def unfollow(self, request):
         if isinstance(request.user, AnonymousUser):
             return Response({'error':'user is not authintecated'}, status=status.HTTP_401_UNAUTHORIZED)
-        serialized_data = ListSerializer(request.data)
+        serialized_data = ListSerializer(data=request.data)
         if serialized_data.is_valid():
-            return serialized_data.unfollow(**serialized_data.validated_data)
+            return Response({'success':ListSerializer(serialized_data.unfollow(**serialized_data.validated_data).data)}, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['patch'], detail=False)
+    @action(methods=['post'], detail=False)
     def add_member(self, request):
         if isinstance(request.user, AnonymousUser):
             return Response({'error':'user is not authintecated'}, status=status.HTTP_401_UNAUTHORIZED)
-        serialized_data = ListSerializer(request.data)
+        serialized_data = ListSerializer(data=request.data)
         if serialized_data.is_valid():
-            return serialized_data.add_member(**serialized_data.validated_data)
+            return Response({'success':ListSerializer(serialized_data.add_member(**serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['patch'], detail=False)
+    @action(methods=['post'], detail=False)
     def remove_member(self, request):
         if isinstance(request.user, AnonymousUser):
             return Response({'error':'user is not authintecated'}, status=status.HTTP_401_UNAUTHORIZED)
-        serialized_data = ListSerializer(request.data)
+        serialized_data = ListSerializer(data=request.data)
         if serialized_data.is_valid():
-            return serialized_data.remove_member(**serialized_data.validated_data)
+            return Response({'success':ListSerializer(serialized_data.remove_member(**serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)

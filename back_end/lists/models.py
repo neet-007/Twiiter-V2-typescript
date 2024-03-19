@@ -3,7 +3,7 @@ from user_auth.models import UserProfile
 # Create your models here.
 
 class ListManager(models.Manager):
-    def follow(self, user:int, list:int):
+    def follow(self, user:int, list:int) -> 'List':
         try:
             user_= UserProfile.objects.get(user__pk=user)
         except UserProfile.DoesNotExist:
@@ -15,12 +15,12 @@ class ListManager(models.Manager):
             raise ValueError('list does not exits')
 
         list_.followers.add(user_)
-        list_.followers += 1
+        list_.followers_num += 1
         list_.save()
 
         return list_
 
-    def unfollow(self, user:int, list:int):
+    def unfollow(self, user:int, list:int) -> 'List':
         try:
             user_= UserProfile.objects.get(user__pk=user)
         except UserProfile.DoesNotExist:
@@ -33,12 +33,12 @@ class ListManager(models.Manager):
 
         if list_.followers.contains(user_):
             list_.followers.remove(user_)
-            list_.followers -= 1
+            list_.followers_num -= 1
             list_.save()
 
         return list_
 
-    def add_member(self, user:int, list:int):
+    def add_member(self, user:int, list:int) -> 'List':
         try:
             user_= UserProfile.objects.get(user__pk=user)
         except UserProfile.DoesNotExist:
@@ -50,12 +50,12 @@ class ListManager(models.Manager):
             raise ValueError('list does not exits')
 
         list_.members.add(user_)
-        list_.members += 1
+        list_.members_num += 1
         list_.save()
 
         return list_
 
-    def remove_member(self, user:int, list:int):
+    def remove_member(self, user:int, list:int) -> 'List':
         try:
             user_= UserProfile.objects.get(user__pk=user)
         except UserProfile.DoesNotExist:
@@ -68,7 +68,7 @@ class ListManager(models.Manager):
 
         if list_.members.contains(user_):
             list_.members.add(user_)
-            list_.members -= 1
+            list_.members_num -= 1
             list_.save()
 
         return list_
@@ -76,12 +76,12 @@ class ListManager(models.Manager):
 
 class List(models.Model):
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE, name='list_creator')
-    followers = models.ManyToManyField(UserProfile, related_name='list_followers')
-    members = models.ManyToManyField(UserProfile, related_name='list_members')
+    followers = models.ManyToManyField(UserProfile, related_name='list_followers', blank=True)
+    members = models.ManyToManyField(UserProfile, related_name='list_members', blank=True)
     name = models.CharField(max_length=125)
     description = models.CharField(max_length=255)
-    private = models.BooleanField(default=False)
-    followers_num = models.PositiveIntegerField(default=0)
-    members_num = models.PositiveIntegerField(default=0)
+    private = models.BooleanField(default=False, blank=True)
+    followers_num = models.PositiveIntegerField(default=0, blank=True)
+    members_num = models.PositiveIntegerField(default=0, blank=True)
 
     objects = ListManager()
