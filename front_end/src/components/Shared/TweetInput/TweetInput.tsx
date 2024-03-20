@@ -2,10 +2,11 @@ import React, { ComponentProps, useEffect, useRef, useState } from 'react'
 import { Button } from '../Button/Button'
 import { ProfileIcon } from '../ProfileIcon/ProfileIcon'
 import { EmojiSmile, GeoAlt, Image } from 'react-bootstrap-icons'
-import { useMakeTweet } from '../../../lib/ReactQuery'
+import { useMakePostComment, useMakeTweet } from '../../../lib/ReactQuery'
 
 interface TweetInputProps extends ComponentProps<'div'>{
   mobile?:boolean
+  tweetId?:number
 }
 
 function adjustHeight(textarea?:HTMLTextAreaElement){
@@ -15,8 +16,9 @@ function adjustHeight(textarea?:HTMLTextAreaElement){
     }
   }
 
-export const TweetInput:React.FC<TweetInputProps> = ({mobile}) => {
+export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId}) => {
   const {mutateAsync:tweet, data} = useMakeTweet()
+  const {mutate:commentFunc} = useMakePostComment()
   const [value, setValue] = useState<string>('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -28,8 +30,11 @@ export const TweetInput:React.FC<TweetInputProps> = ({mobile}) => {
 
   function handleSubmit(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault()
-    if(textareaRef.current)
-    tweet({text:textareaRef.current?.value})
+    if(textareaRef.current){
+      console.log(tweetId)
+      if(tweetId) return commentFunc({tweetId, text:textareaRef.current.value})
+      tweet({text:textareaRef.current?.value})
+    }
   }
 
   return (

@@ -10,14 +10,13 @@ user_model = get_user_model()
 class TweetManager(models.Manager):
     def create_tweet(self, user:AbstractBaseUser, text:str, tweet_replied_to:int=None) -> 'Tweet':
         if tweet_replied_to:
-            """
             try:
                 tweet_replied_to_ = Tweet.objects.get(pk=tweet_replied_to)
             except Tweet.DoesNotExist:
                 print_exc()
                 raise Exception('error occured when creating tweet')
-            """
-            tweet = Tweet(user=user, text=text, tweet_replied_to=tweet_replied_to, is_reply=True)
+
+            tweet = Tweet(user=user, text=text, tweet_replied_to=tweet_replied_to_, is_reply=True)
             tweet.save()
             return tweet
 

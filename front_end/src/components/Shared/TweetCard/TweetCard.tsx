@@ -1,6 +1,7 @@
 import React, { ComponentProps, useState } from 'react'
 import { Bookmark, BookmarkFill, Chat, Heart, HeartFill } from 'react-bootstrap-icons'
 import { useBookmarkTweet, useLikeTweet } from '../../../lib/ReactQuery'
+import { useNavigate } from 'react-router-dom'
 
 export interface Tweet{
     id:number
@@ -18,12 +19,13 @@ interface TweetCardProps extends ComponentProps<'article'>{
 }
 
 export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
-  const {mutateAsync:likeFunc} = useLikeTweet()
+  const {mutate:likeFunc,} = useLikeTweet()
   const {mutateAsync:bookmarkFunc} = useBookmarkTweet()
-  const [like, setLike] = useState<{isLike:boolean, pending:boolean, likes:number}>({isLike:false, pending:false, likes:tweet.likes})
-  const [bookmark, setBookmark] = useState<{isBookmark:boolean, pending:boolean, bookmarks:number}>({isBookmark:false, pending:false, bookmarks:tweet.bookmarks})
+  const navigate = useNavigate()
+  //const [like, setLike] = useState<{isLike:boolean, pending:boolean, likes:number}>({isLike:false, pending:false, likes:tweet.likes})
+  //const [bookmark, setBookmark] = useState<{isBookmark:boolean, pending:boolean, bookmarks:number}>({isBookmark:false, pending:false, bookmarks:tweet.bookmarks})
 
-  function handleLike(){
+/*  function handleLike(){
     if(like.pending) return
     setLike(prev => ({...prev, isLike:!prev.isLike, pending:true, likes:prev.isLike ? tweet.likes - 1 : tweet.likes + 1}))
     likeFunc({tweetId:tweet.id})
@@ -42,8 +44,9 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
         setBookmark(prev => ({...prev, isBookmark:res['success'], pending:false, bookmarks:tweet.bookmarks + 1}))
     })
   }
+*/
   return (
-    <article className='flex gap-2'>
+    <article className='flex gap-2' onClick={() => navigate(`/post/${tweet.id}`)}>
         <div>{tweet.user.img}</div>
         <div className='w-full'>
             <div className='flex gap-2'>
@@ -56,20 +59,20 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
             <div className='flex justify-between'>
                 <div className='flex items-center justify-center gap-2'><Chat/>{tweet.replies}</div>
                 <div className='flex items-center justify-center gap-2'>
-                    {like.isLike?
-                        <HeartFill fill='red' onClick={handleLike}/>
-                    :
-                        <Heart onClick={handleLike}/>
+                    {//like.isLike?
+                        <HeartFill fill='red' onClick={() => likeFunc({tweetId:tweet.id, tweet:{...tweet, likes:tweet.likes + 1}})}/>
+                    //:
+                      //  <Heart onClick={handleLike}/>
                     }
-                    {like.likes}
+                    {tweet.likes}
                     </div>
                 <div className='flex items-center justify-center gap-2'>
-                    {bookmark.isBookmark?
-                       <BookmarkFill onClick={handleBookmark}/>
-                    :
-                        <Bookmark onClick={handleBookmark}/>
+                    {//bookmark.isBookmark?
+                       <BookmarkFill onClick={() => bookmarkFunc({tweetId:tweet.id, tweet:{...tweet, bookmarks:tweet.bookmarks + 1}})}/>
+                    //:
+                    //    <Bookmark onClick={handleBookmark}/>
                     }
-                    {bookmark.bookmarks}
+                    {tweet.bookmarks}
                     </div>
             </div>
         </div>

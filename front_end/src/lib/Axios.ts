@@ -86,9 +86,40 @@ export async function logout() {
     }
 }
 
-export async function GetMainPageTweets(){
+export async function GetMainPageTweets({pageParam}:{pageParam:number}){
     try {
-        let res = await axios.get('/api/tweets/tweet/')
+        let res = await axios.get(`/api/tweets/tweet/?page=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function getSingleTweet({tweetId}:{tweetId:number}){
+    try {
+        let res = await axios.get(`/api/tweets/tweet/${tweetId}/`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function getPostComments({pageParam, tweetId}:{pageParam?:number, tweetId:number}){
+    try {
+        let res = await axios.get(`/api/tweets/tweet/${tweetId}/comments?=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function makePostComment({tweetId, text}:{tweetId:number, text:string}){
+    try {
+        console.log('ghhhheererere')
+        let res = await axios.post(`/api/tweets/tweet/${tweetId}/comments/`, {text}, config)
         console.log(res)
         return res.data
     } catch (error) {
@@ -130,6 +161,16 @@ export async function bookmarkTweet({tweetId}:{tweetId:number}) {
     try {
         let res = await axios.post(`/api/tweets/bookmark/`, {tweet:tweetId}, config)
         console.log(res.data)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function getSingleList({listId}:{listId:number}){
+    try {
+        let res = await axios.get(`/api/lists/list/${listId}/`)
+        console.log(res)
         return res.data
     } catch (error) {
         console.log(error)

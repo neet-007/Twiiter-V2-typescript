@@ -7,10 +7,11 @@ import { TweetPage } from '../../components/Mobile/TweetPage'
 import { BottomBar } from '../../components/Mobile/BottomBar'
 import { SideNav } from '../../components/Mobile/SideNav'
 import { TopBar } from './TopBar'
-import { useGetMainPageTweets } from '../../lib/ReactQuery'
+import { useInfiniteTweets } from '../../lib/ReactQuery'
 
 export const MainPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
-  const {data, isLoading, isError, error} = useGetMainPageTweets()
+  //const {data, isLoading, isError, error} = useGetMainPageTweets()
+  const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useInfiniteTweets()
   const [section, setSection] = useState<string>('home')
 
   if(isLoading) return<h1>loading...</h1>
@@ -18,14 +19,16 @@ export const MainPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
     console.log(error)
     return <h1>error</h1>
   }
+  console.log(data)
   return (
     <section {...props}>
       <TopBar/>
       <SectionSelector section={section} sectionClick={setSection} buttonsArray={['home', 'away']}/>
       <TweetInput/>
-      {data?.results.map((tweet:Tweet) => {
+      {data?.pages.map(page => page.results.map((tweet:Tweet) => {
         return <TweetCard key={tweet.id} tweet={tweet}/>
-      })}
+      }))}
+      <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>load more</button>
     </section>
   )
 }

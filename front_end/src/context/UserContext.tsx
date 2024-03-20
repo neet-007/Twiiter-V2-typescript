@@ -1,6 +1,15 @@
 import React, {useState, useEffect, createContext, useContext, ComponentProps} from "react";
 import { getCheckUser } from "../lib/Axios";
 
+export interface UserInterface{
+    userName:string | undefined,
+    mention:string | undefined,
+    bio:string | undefined,
+    following:number | undefined,
+    followers:number | undefined,
+    is_verified:boolean
+}
+
 const INITAIL_USER = {
     userName:undefined,
     mention:undefined,
@@ -11,7 +20,7 @@ const INITAIL_USER = {
 }
 
 interface ContextType{
-    user: typeof INITAIL_USER
+    user: UserInterface
     setUser:React.Dispatch<React.SetStateAction<any>>
     isAuthenticated:boolean
     setIsAuthenticated:React.Dispatch<React.SetStateAction<any>>

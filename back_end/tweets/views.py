@@ -4,17 +4,20 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator, EmptyPage
 from user_auth.models import UserProfile
 from user_auth.serializers import UserProfileSerlializer
 from .models import Tweet, Bookmark, Like
-from .serializers import TweetSerializer, BookmarkSerializer, LikeSerializer
+from .serializers import TweetSerializer, BookmarkSerializer, LikeSerializer, CommmentsSerializer
+from .pagination import TweetsPaginator
 # Create your views here.
 user_model = get_user_model()
 
 class TweetViewset(ModelViewSet):
-    queryset = Tweet.objects.all()
+    queryset = Tweet.objects.all().order_by('-time')
     serializer_class = TweetSerializer
+    pagination_class = TweetsPaginator
 
     @action(methods=['get'], detail=False)
     def get_user_profile(self, request):
@@ -43,6 +46,41 @@ class TweetViewset(ModelViewSet):
         return_dict['results'] = TweetSerializer(page_obj.object_list, many=True).data
 
         return Response({'success':return_dict}, status=status.HTTP_200_OK)
+
+    @action(methods=['get', 'post'], detail=True)
+    def comments(self, request, pk):
+        if request.method == 'GET':
+            page = request.GET.get('page', 1)
+
+            paginator = Paginator(Tweet.objects.filter(is_reply=True, tweet_replied_to__pk=pk).order_by('-time'), per_page=10)
+            page_obj = paginator.page(page)
+
+            return_dict = {'count':paginator.count, 'next':None, 'previous':None, 'results':[]}
+
+            if page_obj.has_next():
+                return_dict['next'] = page_obj.next_page_number()
+            if page_obj.has_previous():
+                return_dict['previous'] = page_obj.previous_page_number()
+
+            return_dict['results'] = TweetSerializer(page_obj.object_list, many=True).data
+
+            return Response(return_dict, status=status.HTTP_200_OK)
+
+        if isinstance(request.user, AnonymousUser):
+            return Response({'error':'user is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            user = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({'error':'userprofile does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serialized_data = CommmentsSerializer(data=request.data, context={'user':user, 'tweet_replied_to':pk})
+        print('hheeeeeerr')
+        if serialized_data.is_valid():
+            comment = serialized_data.create(serialized_data.validated_data)
+            return Response(TweetSerializer(comment).data, status=status.HTTP_201_CREATED)
+
+        return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

@@ -1,4 +1,5 @@
 from rest_framework.serializers import ModelSerializer, ValidationError
+from user_auth.serializers import UserProfileSerlializer
 from .models import Tweet, Bookmark, Like
 
 class TweetSerializer(ModelSerializer):
@@ -23,6 +24,22 @@ class TweetSerializer(ModelSerializer):
 
     def create(self, validated_data):
         return self.Meta.model.objects.create_tweet(**validated_data)
+
+class CommmentsSerializer(ModelSerializer):
+    class Meta:
+        model = Tweet
+        fields = ['user', 'tweet_replied_to', 'text']
+        extra_kwargs = {'user':{'read_only':True},
+                        'tweet_replied_to':{'read_only':True},}
+
+    def validate(self, attrs):
+        attrs['user'] = self.context.get('user')
+        attrs['tweet_replied_to'] = self.context.get('tweet_replied_to')
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        return self.Meta.model.objects.create_tweet(**validated_data)
+
 
 class BookmarkSerializer(ModelSerializer):
     class Meta:

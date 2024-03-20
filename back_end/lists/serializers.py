@@ -1,7 +1,9 @@
 from rest_framework.serializers import ModelSerializer, ValidationError, IntegerField
+from user_auth.serializers import UserProfileSerlializer
 from.models import List
 
 class ListSerializer(ModelSerializer):
+    list_creator = UserProfileSerlializer(required=False)
     follower = IntegerField(required=False)
     member = IntegerField(required=False)
     list = IntegerField(required=False)
@@ -11,7 +13,6 @@ class ListSerializer(ModelSerializer):
         extra_kwargs = {
             'name':{'required':False},
             'description':{'required':False},
-            'creator':{'required':False},
             'followers':{'required':False},
             'members':{'required':False},
             'private':{'required':False},
