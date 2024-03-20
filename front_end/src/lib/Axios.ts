@@ -176,3 +176,23 @@ export async function getSingleList({listId}:{listId:number}){
         console.log(error)
     }
 }
+
+export async function getListTweets({listId, pageParam=1}:{listId:number, pageParam?:number}){
+    try {
+        let res = await axios.get(`/api/lists/list/${listId}/tweets/?page=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function search({q, f, page=1}:{q:string, f?:string, page:number}){
+    try {
+        let res = await axios.get(`/api/search/?q=${q}${f ? `&f=${f}`:''}&page=${page}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}

@@ -4,6 +4,7 @@ import { ListCard } from './ListCard'
 import { UserInterface } from '../../context/UserContext'
 
 export interface List {
+  id:number
   name:string
   description:string
   followers_num:number

@@ -8,5 +8,5 @@ router.register('bookmark', views.BookmarkViewset)
 router.register('like', views.LikeViewset)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
 ]

@@ -1,11 +1,13 @@
 import React, { ComponentProps } from 'react'
 import { useParams } from 'react-router-dom'
-import { useGetSingleList } from '../../lib/ReactQuery'
+import { useGetListTweets, useGetSingleList } from '../../lib/ReactQuery'
 import { List } from './ListPage'
+import { Tweet, TweetCard } from '../../components/Shared/TweetCard/TweetCard'
 
 export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
   const {listId} = useParams()
   const {data, isLoading, isError, error} = useGetSingleList({listId:Number(listId)})
+  const {data:tweets, isLoading:tweetsIsLoading, isError:tweetsIsError, error:tweetsError} = useGetListTweets({listId:Number(listId)})
 
   if(isLoading) return <h1>Loading...</h1>
   if(isError) {
@@ -25,15 +27,17 @@ export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
             </div>
             {list.list_creator.mention}
         </div>
+        {!(tweetsIsLoading || tweetsIsError)&&
         <div>
-            tweet
-            tweet
-            tweet
-            tweet
-            tweet
-            tweet
-            tweet
+            {tweets?.pages[0].count === 0 ?
+            <p>no tweets yet</p>
+            :
+            tweets?.pages.map(page => page.results.map((tweet:Tweet) => {
+              return <TweetCard key={tweet.id} tweet={tweet}/>
+            }))
+            }
         </div>
+        }
     </section>
   )
 }

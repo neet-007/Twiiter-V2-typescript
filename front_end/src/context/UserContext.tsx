@@ -2,7 +2,8 @@ import React, {useState, useEffect, createContext, useContext, ComponentProps} f
 import { getCheckUser } from "../lib/Axios";
 
 export interface UserInterface{
-    userName:string | undefined,
+    id:number | undefined
+    user_name:string | undefined,
     mention:string | undefined,
     bio:string | undefined,
     following:number | undefined,
@@ -11,7 +12,8 @@ export interface UserInterface{
 }
 
 const INITAIL_USER = {
-    userName:undefined,
+    id:undefined,
+    user_name:undefined,
     mention:undefined,
     bio:undefined,
     following:undefined,

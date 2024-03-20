@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useInfiniteQuery} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList } from "./Axios";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search } from "./Axios";
 import {queryclient} from '../main'
 import { Tweet, TweetCard } from "../components/Shared/TweetCard/TweetCard";
 
@@ -117,5 +117,23 @@ export function useGetSingleList({listId}:{listId:number}){
     return useQuery({
         queryKey:['list', listId],
         queryFn:() => getSingleList({listId})
+    })
+}
+
+export function useGetListTweets({listId, pageParam}:{listId:number, pageParam?:number}){
+    return useInfiniteQuery({
+        queryKey:['list', 'list-tweets', listId],
+        initialPageParam:1,
+        getNextPageParam:(lastPage) => lastPage.next,
+        queryFn:() => getListTweets({listId})
+    })
+}
+
+export function useSearch({q, f, page}:{q:string, f?:string, page:number}){
+    return useInfiniteQuery({
+        queryKey:['search', q, f, page],
+        initialPageParam:1,
+        getNextPageParam:(lastPage) => lastPage.next,
+        queryFn:() => search({q, f, page})
     })
 }

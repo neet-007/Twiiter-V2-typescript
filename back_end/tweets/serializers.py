@@ -3,6 +3,7 @@ from user_auth.serializers import UserProfileSerlializer
 from .models import Tweet, Bookmark, Like
 
 class TweetSerializer(ModelSerializer):
+    user = UserProfileSerlializer()
     class Meta:
         model = Tweet
         fields = '__all__'
