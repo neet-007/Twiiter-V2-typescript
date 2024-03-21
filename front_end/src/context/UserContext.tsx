@@ -8,7 +8,8 @@ export interface UserInterface{
     bio:string | undefined,
     following:number | undefined,
     followers:number | undefined,
-    is_verified:boolean
+    is_verified:boolean,
+    is_followed:boolean
 }
 
 const INITAIL_USER = {
@@ -18,7 +19,8 @@ const INITAIL_USER = {
     bio:undefined,
     following:undefined,
     followers:undefined,
-    is_verified:false
+    is_verified:false,
+    is_followed:false
 }
 
 interface ContextType{

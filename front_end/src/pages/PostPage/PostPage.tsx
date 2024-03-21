@@ -6,6 +6,7 @@ import { TweetInput } from '../../components/Shared/TweetInput/TweetInput'
 
 export const PostPage:React.FC<ComponentProps<'section'>> = () => {
   const {tweetId} = useParams()
+
   const {data:tweet, isLoading:TweetIsLoading, isError:TweetIsError, error:tweetError} = useGetSingleTweet({tweetId:Number(tweetId)})
   const {data:comments, isLoading:commentsIsLoading, isError:commentsIsError, error:commentsError} = useGetPostComments({tweetId:Number(tweetId)})
   return (

@@ -1,9 +1,11 @@
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework.serializers import ModelSerializer, ValidationError, SerializerMethodField
 from user_auth.serializers import UserProfileSerlializer
 from .models import Tweet, Bookmark, Like
 
 class TweetSerializer(ModelSerializer):
     user = UserProfileSerlializer()
+    is_liked = SerializerMethodField(method_name='get_is_liked')
+    is_bookmarked = SerializerMethodField(method_name='get_is_bookmarked')
     class Meta:
         model = Tweet
         fields = '__all__'
@@ -25,6 +27,16 @@ class TweetSerializer(ModelSerializer):
 
     def create(self, validated_data):
         return self.Meta.model.objects.create_tweet(**validated_data)
+
+    def get_is_liked(self, obj):
+        if not self.context.get('user_get'):
+            return False
+        return Like.objects.filter(user=self.context.get('user_get'), tweet=obj).exists()
+
+    def get_is_bookmarked(self, obj):
+        if not self.context.get('user_get'):
+            return False
+        return Bookmark.objects.filter(user=self.context.get('user_get'), tweet=obj).exists()
 
 class CommmentsSerializer(ModelSerializer):
     class Meta:

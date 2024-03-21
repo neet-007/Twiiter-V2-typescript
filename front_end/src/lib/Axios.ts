@@ -96,6 +96,16 @@ export async function GetMainPageTweets({pageParam}:{pageParam:number}){
     }
 }
 
+export async function getMainPageTweets({type, pageParam}:{type:'for-you' | 'following', pageParam?:number}){
+    try {
+        let res = await axios.get(`/api/tweets/tweet/main_page/?type=${type}&page=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export async function getSingleTweet({tweetId}:{tweetId:number}){
     try {
         let res = await axios.get(`/api/tweets/tweet/${tweetId}/`)
@@ -190,6 +200,16 @@ export async function getListTweets({listId, pageParam=1}:{listId:number, pagePa
 export async function search({q, f, page=1}:{q:string, f?:string, page:number}){
     try {
         let res = await axios.get(`/api/search/?q=${q}${f ? `&f=${f}`:''}&page=${page}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function following({follower, unfollow}:{follower:number, unfollow?:boolean}){
+    try {
+        let res = await axios.post(`/api/following/follow/`, {follower, unfollow}, config)
         console.log(res)
         return res.data
     } catch (error) {

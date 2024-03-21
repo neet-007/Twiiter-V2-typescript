@@ -38,7 +38,7 @@ class Tweet(models.Model):
     objects = TweetManager()
 
 class BookmarkManager(models.Manager):
-    def create(self, user:AbstractBaseUser, tweet:Tweet) -> 'Bookmark':
+    def create(self, user:UserProfile, tweet:Tweet) -> 'Bookmark':
         """
         try:
             tweet_ = Tweet.objects.get(pk=tweet)
@@ -51,7 +51,7 @@ class BookmarkManager(models.Manager):
         return bookmark
 
 class Bookmark(models.Model):
-    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
 
     objects = BookmarkManager()
@@ -68,7 +68,7 @@ class Bookmark(models.Model):
         return super().delete(*args, **kwargs)
 
 class LikeManager(models.Manager):
-    def create(self, user:AbstractBaseUser, tweet:Tweet) -> 'Like':
+    def create(self, user:UserProfile, tweet:Tweet) -> 'Like':
         """
         try:
             tweet_ = Tweet.objects.get(pk=tweet)
@@ -81,7 +81,7 @@ class LikeManager(models.Manager):
         return like
 
 class Like(models.Model):
-    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
 
     objects = LikeManager()

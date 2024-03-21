@@ -1,7 +1,6 @@
-import { useQuery, useMutation, useInfiniteQuery} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search } from "./Axios";
-import {queryclient} from '../main'
-import { Tweet, TweetCard } from "../components/Shared/TweetCard/TweetCard";
+import { useQuery, useMutation, useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets } from "./Axios";
+import { Tweet } from "../components/Shared/TweetCard/TweetCard";
 
 export function useRegister(){
     return useMutation({
@@ -43,6 +42,7 @@ export function useGetUserProfile({userId, page}:{userId?:number, page:number}){
 }
 
 export function useMakeTweet(){
+    const queryclient = useQueryClient()
     return useMutation({
         mutationFn:({text}:{text:string}) => Createtweet({text}),
         onSuccess:() => {queryclient.invalidateQueries({queryKey:['tweets-i']})}
@@ -50,6 +50,7 @@ export function useMakeTweet(){
 }
 
 export function useLikeTweet(){
+    const queryclient = useQueryClient()
     return useMutation({
         mutationFn:({tweetId, tweet}:{tweetId:number, tweet?:Tweet}) => likeTweet({tweetId}),
         onMutate:async ({tweetId, tweet}) => {
@@ -57,11 +58,15 @@ export function useLikeTweet(){
             const prevData = queryclient.getQueryData(['tweets-i', tweetId])
             queryclient.setQueryData(['tweets-i', tweetId], tweet)
             return { prevData, tweet}
+        },
+        onSuccess:(data) => {
+            queryclient.invalidateQueries({queryKey:['tweet', data.tweet_id]})
         }
     })
 }
 
 export function useBookmarkTweet(){
+    const queryclient = useQueryClient()
     return useMutation({
         mutationFn:({tweetId, tweet}:{tweetId:number, tweet?:Tweet}) => bookmarkTweet({tweetId}),
         onMutate:async ({tweetId, tweet}) => {
@@ -72,8 +77,9 @@ export function useBookmarkTweet(){
             queryclient.setQueryData(['tweets-i', tweetId], tweet)
             return {prevData, tweet}
         },
-        onSettled: ({tweetId}) => {
-            queryclient.invalidateQueries({queryKey:['tweets-i', tweetId]})
+        onSuccess: (data) => {
+            console.log(data)
+            queryclient.invalidateQueries({queryKey:['tweet', data.tweet_id]})
         }
     })
 }
@@ -85,6 +91,15 @@ export function useInfiniteTweets(){
         queryFn:GetMainPageTweets,
         getNextPageParam:(lastPage) => lastPage.next,
 
+    })
+}
+
+export function useGetMainPageTweets(type:'for-you' | 'following'){
+    return useInfiniteQuery({
+        queryKey:['tweets-main', type],
+        initialPageParam:1,
+        queryFn: ({queryKey, pageParam}) => getMainPageTweets({type:queryKey[1] as 'for-you' | 'following', pageParam}),
+        getNextPageParam:(lastPage) => lastPage.next,
     })
 }
 
@@ -105,6 +120,7 @@ export function useGetPostComments({tweetId}:{tweetId:number}){
 }
 
 export function useMakePostComment(){
+    const queryclient = useQueryClient()
     return useMutation({
         mutationFn:({tweetId, text}:{tweetId:number, text:string}) => makePostComment({tweetId, text}),
         onSuccess:(data, {tweetId}) => {
@@ -135,5 +151,11 @@ export function useSearch({q, f, page}:{q:string, f?:string, page:number}){
         initialPageParam:1,
         getNextPageParam:(lastPage) => lastPage.next,
         queryFn:() => search({q, f, page})
+    })
+}
+
+export function useFollowing(){
+    return useMutation({
+        mutationFn:({follower, unfollow}:{follower:number, unfollow?:boolean}) => following({follower, unfollow})
     })
 }

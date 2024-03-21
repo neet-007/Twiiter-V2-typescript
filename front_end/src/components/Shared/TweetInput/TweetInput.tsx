@@ -16,7 +16,7 @@ function adjustHeight(textarea?:HTMLTextAreaElement){
     }
   }
 
-export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId}) => {
+export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId ,className}) => {
   const {mutateAsync:tweet, data} = useMakeTweet()
   const {mutate:commentFunc} = useMakePostComment()
   const [value, setValue] = useState<string>('')
@@ -38,8 +38,8 @@ export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId}) => {
   }
 
   return (
-    <div className='flex'>
-        <ProfileIcon className=' basis-[10%]' Width='w-[10%]'/>
+    <div className={`flex ${className}`}>
+        <ProfileIcon className=' basis-[10%] ' Width='w-[10%]'/>
         <form onSubmit={handleSubmit} className=' basis-[90%] flex flex-col gap-7'>
             <textarea name="" id="" className='w-full outline-none' style={{height:'0px'}}
              placeholder='What is happing ?!'

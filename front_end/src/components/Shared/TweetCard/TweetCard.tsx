@@ -13,6 +13,8 @@ export interface Tweet{
     likes:number
     replies:number
     bookmarks:number
+    is_liked:boolean,
+    is_bookmarked:boolean
 }
 
 interface TweetCardProps extends ComponentProps<'article'>{
@@ -23,7 +25,6 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
   const {mutate:likeFunc,} = useLikeTweet()
   const {mutateAsync:bookmarkFunc} = useBookmarkTweet()
   const navigate = useNavigate()
-  console.log(tweet)
   //const [like, setLike] = useState<{isLike:boolean, pending:boolean, likes:number}>({isLike:false, pending:false, likes:tweet.likes})
   //const [bookmark, setBookmark] = useState<{isBookmark:boolean, pending:boolean, bookmarks:number}>({isBookmark:false, pending:false, bookmarks:tweet.bookmarks})
 
@@ -48,31 +49,33 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
   }
 */
   return (
-    <article className='flex gap-2' onClick={() => navigate(`/post/${tweet.id}`)}>
+    <article className='flex gap-2'>
         <div>{tweet.user.user_name}</div>
         <div className='w-full'>
+          <div onClick={() => navigate(`/post/${tweet.id}`)}>
             <div className='flex gap-2'>
                 <p>{tweet.user.user_name}</p>
                 <p>@{tweet.user.mention}</p>
                 <p>{tweet.time}</p>
             </div>
+          </div>
             <div>{tweet.text}</div>
             <div>{tweet.img}</div>
             <div className='flex justify-between'>
                 <div className='flex items-center justify-center gap-2'><Chat/>{tweet.replies}</div>
                 <div className='flex items-center justify-center gap-2'>
-                    {//like.isLike?
+                    {tweet.is_liked?
                         <HeartFill fill='red' onClick={() => likeFunc({tweetId:tweet.id, tweet:{...tweet, likes:tweet.likes + 1}})}/>
-                    //:
-                      //  <Heart onClick={handleLike}/>
+                    :
+                        <Heart onClick={() => likeFunc({tweetId:tweet.id, tweet:{...tweet, likes:tweet.likes - 1}})}/>
                     }
                     {tweet.likes}
                     </div>
                 <div className='flex items-center justify-center gap-2'>
-                    {//bookmark.isBookmark?
+                    {tweet.is_bookmarked?
                        <BookmarkFill onClick={() => bookmarkFunc({tweetId:tweet.id, tweet:{...tweet, bookmarks:tweet.bookmarks + 1}})}/>
-                    //:
-                    //    <Bookmark onClick={handleBookmark}/>
+                    :
+                        <Bookmark onClick={() => bookmarkFunc({tweetId:tweet.id, tweet:{...tweet, bookmarks:tweet.bookmarks - 1}})}/>
                     }
                     {tweet.bookmarks}
                     </div>

@@ -2,7 +2,7 @@ import React, { ComponentProps } from 'react'
 
 interface ProfileIconProps extends ComponentProps<'image'>{
     imgSrc?:string
-    Width:string
+    Width?:string
 }
 
 export const ProfileIcon:React.FC<ProfileIconProps> = ({imgSrc, className, Width}) => {
