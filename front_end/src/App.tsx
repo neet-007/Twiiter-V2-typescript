@@ -17,8 +17,8 @@ function App() {
 
   return (
     <div className=" flex relative">
-      <SideNav className="fixed"/>
-      <main className="h-dvh relative ml-[20%]">
+      <SideNav className="fixed hidden sm:flex"/>
+      <main className="h-dvh relative ml-[0%] sm:ml-[20%] w-full lg:w-[50%]">
         <Routes>
           <Route path="" element={<MainPage/>}/>
           <Route path="search" element={<SearchPage/>}/>
@@ -31,7 +31,7 @@ function App() {
             <Route path="auth/login" element={<Login/>}/>
             <Route path="auth/make-profile" element={<MakeProfile/>}/>
         </Routes>
-        {/*<BottomBar/>*/}
+        <BottomBar className=" flex sm:hidden"/>
       </main>
       <SearchBar className=" left-[72%] fixed right-0 hidden lg:flex"/>
     </div>

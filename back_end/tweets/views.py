@@ -75,7 +75,7 @@ class TweetViewset(ModelViewSet):
             return_dict['previous'] = page_obj.previous_page_number()
 
         return_dict['user'] = UserProfileSerlializer(user_, context={'user':request.user}).data
-        return_dict['results'] = TweetSerializer(page_obj.object_list, many=True).data
+        return_dict['results'] = TweetSerializer(page_obj.object_list, many=True, context={'user_get':user_}).data
 
         return Response({'success':return_dict}, status=status.HTTP_200_OK)
 

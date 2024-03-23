@@ -107,7 +107,7 @@ export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId , modal, c
                 }
             </div>
         </form>
-        <ThreadsTweetInput isOpen={isOpen}/>
+        <ThreadsTweetInput isOpen={isOpen} setIsOpen={setIsOpen}/>
     </div>
   )
 }

@@ -10,13 +10,13 @@ export const MainPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
   //const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useInfiniteTweets()
   const [section, setSection] = useState<'for-you' | 'following'>('for-you')
   const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useGetMainPageTweets(section)
-
+  const [test,setTest] = useState(1)
   if(isLoading) return<h1>loading...</h1>
   if(isError){
     console.log(error)
     return <h1>error</h1>
   }
-  console.log(data)
+  console.log('dsadasdadasd')
   return (
     <section {...props}>
       <TopBar section={section} sectionClick={setSection} buttonsArray={['for-you', 'following']} className=' sticky top-0 md:hidden bg-white bg-opacity-75'/>
@@ -26,6 +26,7 @@ export const MainPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
         return <TweetCard key={tweet.id} tweet={tweet}/>
       }))}
       <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>load more</button>
+      <button className=' m-4' onClick={() => setTest(prev => prev)}>dadada</button>
     </section>
   )
 }
