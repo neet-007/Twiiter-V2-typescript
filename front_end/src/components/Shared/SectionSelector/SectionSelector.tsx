@@ -11,7 +11,7 @@ export const SectionSelector:React.FC<SectionSelectorProps> = ({section, section
     <div className={`flex ${className}`}>
         {buttonsArray.map(item => {
             return <button key={item} onClick={() => sectionClick(item)} className={`basis-full flex justify-center align-middle hover:bg-slate-200 transition-colors ease-in-out duration-200`}>
-                    <p className={`${section === item ? 'border-b-4 border-blue-500 p-2':''}`}>{item}</p>
+                    <p className={`${section === item ? 'border-b-4 border-blue-500':''} p-2`}>{item}</p>
                    </button>
         })}
     </div>

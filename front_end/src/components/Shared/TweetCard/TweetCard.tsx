@@ -1,14 +1,15 @@
-import React, { ComponentProps, useState } from 'react'
+import React, { ComponentProps } from 'react'
 import { Bookmark, BookmarkFill, Chat, Heart, HeartFill } from 'react-bootstrap-icons'
 import { useBookmarkTweet, useLikeTweet } from '../../../lib/ReactQuery'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { UserInterface } from '../../../context/UserContext'
+import { twitterStyleTime } from '../../../utils/twiiterStyleTime'
 
 export interface Tweet{
     id:number
     user:UserInterface
     text:string
-    time:number
+    time:string
     img?:string
     likes:number
     replies:number
@@ -25,6 +26,7 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
   const {mutate:likeFunc,} = useLikeTweet()
   const {mutateAsync:bookmarkFunc} = useBookmarkTweet()
   const navigate = useNavigate()
+  const {pathname} = useLocation()
   //const [like, setLike] = useState<{isLike:boolean, pending:boolean, likes:number}>({isLike:false, pending:false, likes:tweet.likes})
   //const [bookmark, setBookmark] = useState<{isBookmark:boolean, pending:boolean, bookmarks:number}>({isBookmark:false, pending:false, bookmarks:tweet.bookmarks})
 
@@ -52,11 +54,11 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
     <article className='flex gap-2'>
         <div>{tweet.user.user_name}</div>
         <div className='w-full'>
-          <div onClick={() => navigate(`/post/${tweet.id}`)}>
+          <div onClick={() => pathname.includes('/path/') ? () => {} : navigate(`/post/${tweet.id}`)}>
             <div className='flex gap-2'>
                 <p>{tweet.user.user_name}</p>
                 <p>@{tweet.user.mention}</p>
-                <p>{tweet.time}</p>
+                <p>{twitterStyleTime(tweet.time)}</p>
             </div>
           </div>
             <div>{tweet.text}</div>

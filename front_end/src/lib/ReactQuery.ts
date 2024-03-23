@@ -145,7 +145,7 @@ export function useGetListTweets({listId, pageParam}:{listId:number, pageParam?:
     })
 }
 
-export function useSearch({q, f, page}:{q:string, f?:string, page:number}){
+export function useSearch({q, f, page}:{q:string, f?:'live' | 'users' | 'lists', page:number}){
     return useInfiniteQuery({
         queryKey:['search', q, f, page],
         initialPageParam:1,

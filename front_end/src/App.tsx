@@ -17,8 +17,8 @@ function App() {
 
   return (
     <div className=" flex relative">
-      <SideNav className="basis-[20%] fixed"/>
-      <main className="h-dvh ml-[20%]">
+      <SideNav className="fixed"/>
+      <main className="h-dvh relative ml-[20%]">
         <Routes>
           <Route path="" element={<MainPage/>}/>
           <Route path="search" element={<SearchPage/>}/>
@@ -33,7 +33,7 @@ function App() {
         </Routes>
         {/*<BottomBar/>*/}
       </main>
-      <SearchBar className=" w-[28%] fixed right-0"/>
+      <SearchBar className=" left-[72%] fixed right-0 hidden lg:flex"/>
     </div>
   )
 }

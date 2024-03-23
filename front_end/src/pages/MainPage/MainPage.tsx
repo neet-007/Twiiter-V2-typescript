@@ -19,8 +19,8 @@ export const MainPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
   console.log(data)
   return (
     <section {...props}>
-      <TopBar section={section} sectionClick={setSection} buttonsArray={['for-you', 'following']} className=' fixed top-0 w-full'/>
-      <SectionSelector section={section} sectionClick={setSection} buttonsArray={['for-you', 'following']} className=' fixed top-0 w-full'/>
+      <TopBar section={section} sectionClick={setSection} buttonsArray={['for-you', 'following']} className=' sticky top-0 md:hidden bg-white bg-opacity-75'/>
+      <SectionSelector section={section} sectionClick={setSection} buttonsArray={['for-you', 'following']} className=' sticky top-0 hidden md:flex bg-white bg-opacity-75'/>
       <TweetInput className=' mt-[5rem]'/>
       {data?.pages.map(page => page.results.map((tweet:Tweet) => {
         return <TweetCard key={tweet.id} tweet={tweet}/>

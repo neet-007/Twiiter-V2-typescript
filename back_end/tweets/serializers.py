@@ -3,7 +3,7 @@ from user_auth.serializers import UserProfileSerlializer
 from .models import Tweet, Bookmark, Like
 
 class TweetSerializer(ModelSerializer):
-    user = UserProfileSerlializer()
+    user = UserProfileSerlializer(required=False)
     is_liked = SerializerMethodField(method_name='get_is_liked')
     is_bookmarked = SerializerMethodField(method_name='get_is_bookmarked')
     class Meta:

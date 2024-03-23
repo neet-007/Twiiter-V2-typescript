@@ -197,7 +197,7 @@ export async function getListTweets({listId, pageParam=1}:{listId:number, pagePa
     }
 }
 
-export async function search({q, f, page=1}:{q:string, f?:string, page:number}){
+export async function search({q, f, page=1}:{q:string, f?:'live' | 'users' | 'lists', page:number}){
     try {
         let res = await axios.get(`/api/search/?q=${q}${f ? `&f=${f}`:''}&page=${page}`)
         console.log(res)

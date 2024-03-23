@@ -24,7 +24,12 @@ class TweetViewset(ModelViewSet):
     def main_page(self, request):
         page = request.GET.get('page', 1)
         type = request.GET.get('type', 'for-you')
-        print(page)
+
+        try:
+            user_ = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            user_ = None
+
         if type == 'for-you':
             paginator = Paginator(Tweet.objects.all(), per_page=20)
         elif type == 'following':
@@ -45,7 +50,7 @@ class TweetViewset(ModelViewSet):
             return_dict['next'] = page_obj.next_page_number()
         if page_obj.has_previous():
             return_dict['previous'] = page_obj.previous_page_number()
-        return_dict['results'] = TweetSerializer(page_obj.object_list, many=True).data
+        return_dict['results'] = TweetSerializer(page_obj.object_list, many=True, context={'user_get':user_}).data
 
         return Response(return_dict, status=status.HTTP_200_OK)
 
@@ -121,6 +126,7 @@ class TweetViewset(ModelViewSet):
         except UserProfile.DoesNotExist:
             context['user_get'] = None
         context['method'] = self.request.method
+
         return context
 
 class BookmarkViewset(ModelViewSet):
@@ -129,14 +135,19 @@ class BookmarkViewset(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+            user= UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({'error':'user does nto have profile'})
+
+        try:
             tweet = Tweet.objects.get(pk=request.data['tweet'])
         except Tweet.DoesNotExist:
             return Response({'error':'tweet does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            bookmark = Bookmark.objects.get(user=request.user, tweet=tweet)
+            bookmark = Bookmark.objects.get(user=user, tweet=tweet)
         except Bookmark.DoesNotExist:
-            Bookmark.objects.create(user=request.user, tweet=tweet)
+            Bookmark.objects.create(user=user, tweet=tweet)
             return Response({'tweet_id':tweet.pk}, status=status.HTTP_201_CREATED)
 
         bookmark.delete()
@@ -155,14 +166,18 @@ class LikeViewset(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         try:
+            user = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({'error':'user does not have profile'} ,status=status.HTTP_401_UNAUTHORIZED)
+        try:
             tweet = Tweet.objects.get(pk=request.data['tweet'])
         except Tweet.DoesNotExist:
             return Response({'error':'tweet does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            like = Like.objects.get(user=request.user, tweet=tweet)
+            like = Like.objects.get(user=user, tweet=tweet)
         except Like.DoesNotExist:
-            Like.objects.create(user=request.user, tweet=tweet)
+            Like.objects.create(user=user, tweet=tweet)
             return Response({'tweet_id':tweet.pk}, status=status.HTTP_201_CREATED)
 
         like.delete()
