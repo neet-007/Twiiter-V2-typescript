@@ -53,12 +53,6 @@ export function useLikeTweet(){
     const queryclient = useQueryClient()
     return useMutation({
         mutationFn:({tweetId, tweet}:{tweetId:number, tweet?:Tweet}) => likeTweet({tweetId}),
-        onMutate:async ({tweetId, tweet}) => {
-            await queryclient.cancelQueries({queryKey:['tweets-i', tweetId]})
-            const prevData = queryclient.getQueryData(['tweets-i', tweetId])
-            queryclient.setQueryData(['tweets-i', tweetId], tweet)
-            return { prevData, tweet}
-        },
         onSuccess:(data) => {
             queryclient.invalidateQueries({queryKey:['tweet', data.tweet_id]})
         }
@@ -69,14 +63,6 @@ export function useBookmarkTweet(){
     const queryclient = useQueryClient()
     return useMutation({
         mutationFn:({tweetId, tweet}:{tweetId:number, tweet?:Tweet}) => bookmarkTweet({tweetId}),
-        onMutate:async ({tweetId, tweet}) => {
-            await queryclient.cancelQueries({queryKey:['tweets-i', tweetId]})
-            const prevData = queryclient.getQueryData(['tweets-i'])
-            console.log(prevData)
-            console.log(tweet)
-            queryclient.setQueryData(['tweets-i', tweetId], tweet)
-            return {prevData, tweet}
-        },
         onSuccess: (data) => {
             console.log(data)
             queryclient.invalidateQueries({queryKey:['tweet', data.tweet_id]})
