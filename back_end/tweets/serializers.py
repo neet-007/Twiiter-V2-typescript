@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, ValidationError, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, ValidationError, SerializerMethodField, ListField, CharField
 from user_auth.serializers import UserProfileSerlializer
 from .models import Tweet, Bookmark, Like
 
@@ -6,6 +6,7 @@ class TweetSerializer(ModelSerializer):
     user = UserProfileSerlializer(required=False)
     is_liked = SerializerMethodField(method_name='get_is_liked')
     is_bookmarked = SerializerMethodField(method_name='get_is_bookmarked')
+    tags_ = ListField(child=CharField(max_length=140), write_only=True)
     class Meta:
         model = Tweet
         fields = '__all__'
@@ -18,6 +19,7 @@ class TweetSerializer(ModelSerializer):
             'relpies':{'read_only':True},
             'bookmarks':{'read_only':True},
             'is_reply':{'read_only':True},
+            'tags':{'read_only':True}
         }
 
     def validate(self, attrs):

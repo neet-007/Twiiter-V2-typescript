@@ -1,7 +1,7 @@
 import React, { ComponentProps, useEffect, useState } from 'react'
 import { Bookmark, BookmarkFill, Chat, Heart, HeartFill } from 'react-bootstrap-icons'
 import { useBookmarkTweet, useLikeTweet } from '../../../lib/ReactQuery'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { UserInterface } from '../../../context/UserContext'
 import { twitterStyleTime } from '../../../utils/twiiterStyleTime'
 
@@ -14,8 +14,9 @@ export interface Tweet{
     likes:number
     replies:number
     bookmarks:number
-    is_liked:boolean,
+    is_liked:boolean
     is_bookmarked:boolean
+    users_mentiond:string[]
 }
 
 interface TweetCardProps extends ComponentProps<'article'>{
@@ -58,7 +59,13 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
                 <p>{twitterStyleTime(tweet.time)}</p>
             </div>
           </div>
-            <div>{tweet.text}</div>
+            <div>{
+            tweet.text.split(' ').map((word, i) => {
+              if(word.startsWith('#')) return <Link key={tweet.id + word + i} to={'/search'} className=' text-sky-400'>{word} </Link>
+              if(word.startsWith('@') && tweet.users_mentiond.includes(word.replace('@',''))) return <Link key={tweet.id + word + i} to={`/profile/${word.replace('@', '')}`} className=' text-sky-400'>{word} </Link>
+              return <span key={tweet.id + word + i}>{word} </span>
+            })
+            }</div>
             <div>{tweet.img}</div>
             <div className='flex justify-between'>
                 <div className='flex items-center justify-center gap-2'><Chat/>{tweet.replies}</div>
