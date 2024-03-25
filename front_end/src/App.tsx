@@ -23,7 +23,7 @@ function App() {
           <Route path="" element={<MainPage/>}/>
           <Route path="search" element={<SearchPage/>}/>
           <Route path="notification" element={<NotificationsPage/>}/>
-          <Route path="profile/:userId" element={<UserDetailsPage/>}/>
+          <Route path="profile/:userMention" element={<UserDetailsPage/>}/>
           <Route path="lists" element={<ListPage/>}/>
           <Route path="list/:listId" element={<ListDetails/>}/>
           <Route path="post/:tweetId" element={<PostPage/>}/>

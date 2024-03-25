@@ -12,16 +12,18 @@ import { useSearchParams } from 'react-router-dom'
 export const SearchPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const Q = searchParams.get('q') ? searchParams.get('q') as string : ''
-  const F = searchParams.get('f') ? searchParams.get('f')! in ['live', 'users', 'lists'] ? searchParams.get('f') as 'live' | 'users' | 'lists' : 'live' : 'live'
+  const F = searchParams.get('f') ? ['live', 'users', 'lists'].includes(searchParams.get('f')!) ? searchParams.get('f') as 'live' | 'users' | 'lists' : 'live' : 'live'
+  const Src = searchParams.get('src') ? ['typed_query', 'hashtag_click'].includes(searchParams.get('src')!) ? searchParams.get('src') as 'typed_query' | 'hashtag_click' : 'typed_query' : 'typed_query'
   const [q, setQ] = useState<string>(Q)
   const [f, setF] = useState<'live' | 'users' | 'lists'>(F)
+  const [src] = useState<'typed_query' | 'hashtag_click'>(Src)
   const [page, setPage] = useState<number>(1)
 
   useEffect(() => {
-    setSearchParams({q, f})
-  },[q, f])
+    setSearchParams({q, f, src})
+  },[q, f, src])
 
-  const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useSearch({q, f, page})
+  const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useSearch({q, f, src, page})
   if(isError) console.log(error)
   function handleSubmit(e?:React.FormEvent<HTMLFormElement>, debounce?:string){
         if(e && debounce){

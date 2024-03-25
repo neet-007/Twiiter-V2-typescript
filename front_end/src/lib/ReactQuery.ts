@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets } from "./Axios";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList } from "./Axios";
 import { Tweet } from "../components/Shared/TweetCard/TweetCard";
 
 export function useRegister(){
@@ -34,17 +34,17 @@ export function useGetMainPageTweets(){
     })
 }
 */
-export function useGetUserProfile({userId, page}:{userId?:number, page:number}){
+export function useGetUserProfile({userMention, page}:{userMention?:string, page:number}){
     return useQuery({
-        queryKey:['user-profile', userId, page],
-        queryFn:() => getUserProfile({userId, page})
+        queryKey:['user-profile', userMention, page],
+        queryFn:() => getUserProfile({userMention, page})
     })
 }
 
 export function useMakeTweet(){
     const queryclient = useQueryClient()
     return useMutation({
-        mutationFn:({text}:{text:string}) => Createtweet({text}),
+        mutationFn:({text, tags, usersMentioned}:{text:string, tags?:[string], usersMentioned?:[string]}) => Createtweet({text, tags, usersMentioned}),
         onSuccess:() => {queryclient.invalidateQueries({queryKey:['tweets-i']})}
     })
 }
@@ -111,7 +111,17 @@ export function useMakePostComment(){
         mutationFn:({tweetId, text}:{tweetId:number, text:string}) => makePostComment({tweetId, text}),
         onSuccess:(data, {tweetId}) => {
             queryclient.invalidateQueries({queryKey:['comment', tweetId]})
+            queryclient.invalidateQueries({queryKey:['tweet', tweetId]})
         }
+    })
+}
+
+export function useGetUserLists(){
+    return useInfiniteQuery({
+        queryKey:['user-lists'],
+        queryFn:getUserLists,
+        initialPageParam:1,
+        getNextPageParam:(lastPage) => lastPage.next
     })
 }
 
@@ -119,6 +129,16 @@ export function useGetSingleList({listId}:{listId:number}){
     return useQuery({
         queryKey:['list', listId],
         queryFn:() => getSingleList({listId})
+    })
+}
+
+export function useFollowList(){
+    const queryclient = useQueryClient()
+    return useMutation({
+        mutationFn:({listId, isFollowed}:{listId:number, isFollowed:boolean}) => followList({listId, isFollowed}),
+        onSuccess:(data, {listId}) => {
+            queryclient.invalidateQueries({queryKey:['list', listId]})
+        }
     })
 }
 
@@ -131,12 +151,12 @@ export function useGetListTweets({listId, pageParam}:{listId:number, pageParam?:
     })
 }
 
-export function useSearch({q, f, page}:{q:string, f?:'live' | 'users' | 'lists', page:number}){
+export function useSearch({q, f, src, page}:{q:string, f?:'live' | 'users' | 'lists', src:'typed_query' | 'hashtag_click', page:number}){
     return useInfiniteQuery({
         queryKey:['search', q, f, page],
         initialPageParam:1,
         getNextPageParam:(lastPage) => lastPage.next,
-        queryFn:() => search({q, f, page})
+        queryFn:() => search({q, f, src, page})
     })
 }
 

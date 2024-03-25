@@ -22,11 +22,29 @@ class ListViewset(ModelViewSet):
             return Response({'error':'user does not have profile'}, status=status.HTTP_400_BAD_REQUEST)
 
         context['creator'] = user
+        context['userr'] = self.request.user
         return context
 
     @action(methods=['get'], detail=False)
     def user_lists(self, request):
-        pass
+        page = request.GET.get('page', 1)
+        try:
+            user = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({'error':'user does not have profile'}, status=status.HTTP_400_BAD_REQUEST)
+
+        lists = (user.list_set.all() | user.list_followers.all()).distinct()
+        paginator = Paginator(lists, per_page=20)
+        page_obj = paginator.page(page)
+
+        return_dict = {'next':None, 'previous':None, 'results':ListSerializer(page_obj.object_list, many=True, context={'userr':request.user}).data, 'pages':paginator.num_pages, 'count':paginator.count}
+
+        if page_obj.has_next():
+            return_dict['next'] = page_obj.next_page_number()
+        if page_obj.has_previous():
+            return_dict['previous'] = page_obj.previous_page_number()
+
+        return Response(return_dict, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=True)
     def tweets(self, request, pk):
@@ -62,7 +80,8 @@ class ListViewset(ModelViewSet):
 
         serialized_data = ListSerializer(data=request.data, context={'user':user, 'list':pk})
         if serialized_data.is_valid():
-            return Response({'success':ListSerializer(serialized_data.follow(serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
+            print('here')
+            return Response(ListSerializer(serialized_data.follow(serialized_data.validated_data)).data, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
@@ -77,7 +96,8 @@ class ListViewset(ModelViewSet):
 
         serialized_data = ListSerializer(data=request.data, context={'user':user, 'list':pk})
         if serialized_data.is_valid():
-            return Response({'success':ListSerializer(serialized_data.unfollow(serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
+            print('hereeeeeee')
+            return Response(ListSerializer(serialized_data.unfollow(serialized_data.validated_data)).data, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
@@ -87,7 +107,7 @@ class ListViewset(ModelViewSet):
 
         serialized_data = ListSerializer(data=request.data, context={'list':pk})
         if serialized_data.is_valid():
-            return Response({'success':ListSerializer(serialized_data.add_member(serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
+            return Response(ListSerializer(serialized_data.add_member(serialized_data.validated_data)).data, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
@@ -97,5 +117,5 @@ class ListViewset(ModelViewSet):
 
         serialized_data = ListSerializer(data=request.data, context={'list':pk})
         if serialized_data.is_valid():
-            return Response({'success':ListSerializer(serialized_data.remove_member(serialized_data.validated_data)).data}, status=status.HTTP_201_CREATED)
+            return Response(ListSerializer(serialized_data.remove_member(serialized_data.validated_data)).data, status=status.HTTP_201_CREATED)
         return Response({'error':serialized_data.errors}, status=status.HTTP_400_BAD_REQUEST)

@@ -3,7 +3,6 @@ import { Button } from '../Button/Button'
 import { ProfileIcon } from '../ProfileIcon/ProfileIcon'
 import { EmojiSmile, GeoAlt, Image, Plus, X } from 'react-bootstrap-icons'
 import { useMakePostComment, useMakeTweet } from '../../../lib/ReactQuery'
-import { Modal } from '../Modal/Modal'
 import { modalClick } from '../../../utils/modalClick'
 import { ThreadsTweetInput } from './ThreadsTweetInput'
 
@@ -41,8 +40,8 @@ function adjustHeight(textarea?:HTMLTextAreaElement){
   }
 
 export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId , modal, canPostAll, numOfTweets, tweetValue, handleChange, numOfTweetIndex, setNumOfTweets, className}) => {
-  const {mutateAsync:tweet, data} = useMakeTweet()
-  const {mutate:commentFunc} = useMakePostComment()
+  const {mutateAsync:tweet, isSuccess:tweetIsSuccess} = useMakeTweet()
+  const {mutate:commentFunc, isSuccess:commentIsSuccess} = useMakePostComment()
   const [value, setValue] = useState<string>('')
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -53,11 +52,23 @@ export const TweetInput:React.FC<TweetInputProps> = ({mobile, tweetId , modal, c
     }
   },[value, tweetValue])
 
+  useEffect(() => {
+    if (textareaRef.current)
+    setValue('')
+  },[tweetIsSuccess, commentIsSuccess])
+
   function handleSubmit(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault()
     if(textareaRef.current){
       if(tweetId) return commentFunc({tweetId, text:textareaRef.current.value})
-      tweet({text:textareaRef.current?.value})
+
+      const additions = textareaRef.current.value.split(' ').reduce((acc:string[][], curr) => {
+        if(curr.startsWith('#')) acc[0].push(curr.replace('#', ''))
+        else if(curr.startsWith('@')) acc[1].push(curr.replace('@', ''))
+        return acc
+      },[[], []])
+
+      tweet({text:textareaRef.current?.value, tags:additions[0], usersMentioned:additions[1]})
     }
   }
 

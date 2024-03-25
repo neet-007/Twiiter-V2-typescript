@@ -16,7 +16,7 @@ export interface Tweet{
     bookmarks:number
     is_liked:boolean
     is_bookmarked:boolean
-    users_mentiond:string[]
+    users_mentioned:string[]
 }
 
 interface TweetCardProps extends ComponentProps<'article'>{
@@ -61,8 +61,8 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
           </div>
             <div>{
             tweet.text.split(' ').map((word, i) => {
-              if(word.startsWith('#')) return <Link key={tweet.id + word + i} to={'/search'} className=' text-sky-400'>{word} </Link>
-              if(word.startsWith('@') && tweet.users_mentiond.includes(word.replace('@',''))) return <Link key={tweet.id + word + i} to={`/profile/${word.replace('@', '')}`} className=' text-sky-400'>{word} </Link>
+              if(word.startsWith('#')) return <Link key={tweet.id + word + i} to={`/search?q=${word.replace('#', '')}&f=live&src=hashtag_click`} className=' text-sky-400'>{word} </Link>
+              if(word.startsWith('@') && tweet.users_mentioned.includes(word.replace('@',''))) return <Link key={tweet.id + word + i} to={`/profile/${word.replace('@', '')}`} className=' text-sky-400'>{word} </Link>
               return <span key={tweet.id + word + i}>{word} </span>
             })
             }</div>

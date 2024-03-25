@@ -52,7 +52,7 @@ export const SideNav:React.FC<ComponentProps<'nav'>> = ({className, ...props}) =
               </Link>
             </li>
             <li>
-              <Link to={`/profile/${user.id}`} className=" p-2 flex gap-2 items-center">
+              <Link to={`/profile/${user.mention}`} className=" p-2 flex gap-2 items-center">
                 <Person size={20}/>
                 <p className=" hidden md:block">
                   profile

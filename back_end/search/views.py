@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from tweets.models import Tweet
+from tweets.models import Tweet, Tag
 from tweets.serializers import TweetSerializer
 from user_auth.models import UserProfile
 from user_auth.serializers import UserProfileSerlializer
@@ -14,6 +14,7 @@ class Search(APIView):
         search = request.GET.get('q')
         filter = request.GET.get('f')
         page = request.GET.get('p', 1)
+        src = request.GET.get('src', 'typed_query')
 
         if not filter:
             tweets = Tweet.objects.filter(text__icontains=search)
@@ -37,7 +38,20 @@ class Search(APIView):
             return Response(return_dict, status=status.HTTP_200_OK)
 
         if filter == 'live':
-            tweets = Tweet.objects.filter(text__icontains=search).order_by('-time')
+            if src == 'typed_query':
+                tweets = Tweet.objects.filter(text__icontains=search).order_by('-time')
+            elif src == 'hashtag_click':
+                tag = None
+                try:
+                    tag = Tag.objects.get(name=search)
+                except Tag.DoesNotExist:
+                    tweets = Tweet.objects.none()
+
+                if tag:
+                    tweets = tag.tweet_set.all()
+            else:
+                return Response({'error':'src is not supported'}, status=status.HTTP_400_BAD_REQUEST)
+
             paginator = Paginator(tweets, 10)
             page_obj = paginator.page(page)
 

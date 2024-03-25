@@ -10,10 +10,10 @@ import { ArrowLeft } from 'react-bootstrap-icons'
 
 export const UserDetailsPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
   const {user:currentUser} = useUserContext()
-  const {userId} = useParams()
+  const {userMention} = useParams()
   const [page, setPage] = useState<number>(1)
   const [section, setSection] = useState<'posts' | 'replies' | 'media' | 'likes'>('posts')
-  const {data, isLoading, isError, error} = useGetUserProfile({userId:Number(userId), page})
+  const {data, isLoading, isError, error} = useGetUserProfile({userMention:userMention, page})
   const {mutateAsync:following, isPending} = useFollowing()
 
   const navigate = useNavigate()

@@ -57,10 +57,10 @@ class TweetViewset(ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_user_profile(self, request):
         page = request.GET.get('page', 1)
-        user_id = request.GET.get('user-id')
+        user_mention = request.GET.get('user-mention')
 
         try:
-            user_ = UserProfile.objects.get(pk=user_id.replace('/', ''))
+            user_ = UserProfile.objects.get(mention=user_mention.replace('/', ''))
         except:
             return Response({'error':'user not found'}, status=status.HTTP_404_NOT_FOUND)
 

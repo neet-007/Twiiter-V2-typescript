@@ -137,9 +137,9 @@ export async function makePostComment({tweetId, text}:{tweetId:number, text:stri
     }
 }
 
-export async function getUserProfile({userId, page=1}:{userId?:number, page:number}) {
+export async function getUserProfile({userMention, page=1}:{userMention?:string, page:number}) {
     try {
-        let res = await axios.get(`/api/tweets/tweet/get_user_profile?page=${page}&${userId ? `user-id=${userId}`: ''}/`)
+        let res = await axios.get(`/api/tweets/tweet/get_user_profile?page=${page}&${userMention ? `user-mention=${userMention}`: ''}/`)
         console.log(res.data)
         return res.data
     } catch (error) {
@@ -147,9 +147,9 @@ export async function getUserProfile({userId, page=1}:{userId?:number, page:numb
     }
 }
 
-export async function Createtweet({text}:{text:string}) {
+export async function Createtweet({text, tags, usersMentioned}:{text:string, tags?:string[], usersMentioned?:string[]}) {
     try {
-        let res = await axios.post('/api/tweets/tweet/', {text}, config)
+        let res = await axios.post('/api/tweets/tweet/', {text, tags_:tags, users_mentioned_:usersMentioned}, config)
         console.log(res.data)
         return res.data
     } catch (error) {
@@ -177,9 +177,36 @@ export async function bookmarkTweet({tweetId}:{tweetId:number}) {
     }
 }
 
+export async function getUserLists({pageParam}:{pageParam?:number}){
+    try {
+        let res = await axios.get(`/api/lists/list/user_lists/?page=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export async function getSingleList({listId}:{listId:number}){
     try {
         let res = await axios.get(`/api/lists/list/${listId}/`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function followList({listId, isFollowed}:{listId:number, isFollowed:boolean}){
+    try {
+        console.log(isFollowed)
+        if(isFollowed)
+        {
+            let res = await axios.post(`/api/lists/list/${listId}/unfollow/`, {}, config)
+            console.log(res)
+            return res.data
+        }
+        let res = await axios.post(`/api/lists/list/${listId}/follow/`, {}, config)
         console.log(res)
         return res.data
     } catch (error) {
@@ -197,9 +224,9 @@ export async function getListTweets({listId, pageParam=1}:{listId:number, pagePa
     }
 }
 
-export async function search({q, f, page=1}:{q:string, f?:'live' | 'users' | 'lists', page:number}){
+export async function search({q, f, src, page=1}:{q:string, f?:'live' | 'users' | 'lists', src?:'typed_query' | 'hashtag_click', page:number}){
     try {
-        let res = await axios.get(`/api/search/?q=${q}${f ? `&f=${f}`:''}&page=${page}`)
+        let res = await axios.get(`/api/search/?q=${q}${f ? `&f=${f}`:''}${src ? `&src=${src}`:''}&page=${page}`)
         console.log(res)
         return res.data
     } catch (error) {

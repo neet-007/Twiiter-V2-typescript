@@ -25,7 +25,7 @@ class TweetManager(models.Manager):
                 """
                 tags = Tag.objects.bulk_create(tags)
                 """
-                tags = [Tag(name=tag) for tag in tags]
+                tags = [Tag(name=tag.replace('#', '')) for tag in tags]
                 for tag in tags:
                     tag.save()
 
@@ -41,7 +41,7 @@ class TweetManager(models.Manager):
 
         return tweet
 
-    def create_tweet(self, user:UserProfile, text:str, tweet_replied_to:int=None, tags_:list[str]=None) -> 'Tweet':
+    def create_tweet(self, user:UserProfile, text:str, tweet_replied_to:int=None, tags_:list[str]=None, users_mentioned_:list[UserProfile]=None) -> 'Tweet':
         if tweet_replied_to:
             try:
                 tweet_replied_to_ = Tweet.objects.get(pk=tweet_replied_to)
@@ -51,6 +51,9 @@ class TweetManager(models.Manager):
 
             tweet = Tweet(user=user, text=text, tweet_replied_to=tweet_replied_to_, is_reply=True)
             tweet.save()
+            tweet_replied_to_.replies += 1
+            tweet_replied_to_.save()
+
             if tags_:
                 self.add_tags(tweet=tweet, tags=tags_)
             return tweet
@@ -59,6 +62,9 @@ class TweetManager(models.Manager):
         tweet.save()
         if tags_:
             self.add_tags(tweet=tweet, tags=tags_)
+        print(users_mentioned_)
+        if users_mentioned_:
+            tweet.users_mentioned.add(*UserProfile.objects.filter(mention__in=users_mentioned_))
         return tweet
 
 class Tweet(models.Model):
@@ -72,6 +78,7 @@ class Tweet(models.Model):
     bookmarks = models.PositiveIntegerField(default=0, blank=True)
     is_reply = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, blank=True)
+    users_mentioned = models.ManyToManyField(UserProfile, blank=True, related_name='tweet_users_mentioned')
 
     objects = TweetManager()
 

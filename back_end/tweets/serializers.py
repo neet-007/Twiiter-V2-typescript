@@ -1,12 +1,27 @@
 from rest_framework.serializers import ModelSerializer, ValidationError, SerializerMethodField, ListField, CharField
 from user_auth.serializers import UserProfileSerlializer
+from user_auth.models import UserProfile
 from .models import Tweet, Bookmark, Like
+
+class UsersMentiondSerializer(ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['mention']
+
+
+    def to_representation(self, instance):
+        # Get the serialized data
+        data = super().to_representation(instance)
+        # Return only the value without the key
+        return data['mention']
 
 class TweetSerializer(ModelSerializer):
     user = UserProfileSerlializer(required=False)
     is_liked = SerializerMethodField(method_name='get_is_liked')
     is_bookmarked = SerializerMethodField(method_name='get_is_bookmarked')
-    tags_ = ListField(child=CharField(max_length=140), write_only=True)
+    tags_ = ListField(child=CharField(max_length=140), write_only=True, required=False)
+    users_mentioned_ = ListField(child=CharField(max_length=125), write_only=True, required=False)
+    users_mentioned = UsersMentiondSerializer(many=True, read_only=True)
     class Meta:
         model = Tweet
         fields = '__all__'
@@ -19,7 +34,7 @@ class TweetSerializer(ModelSerializer):
             'relpies':{'read_only':True},
             'bookmarks':{'read_only':True},
             'is_reply':{'read_only':True},
-            'tags':{'read_only':True}
+            'tags':{'read_only':True},
         }
 
     def validate(self, attrs):
