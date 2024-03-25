@@ -3,6 +3,7 @@ import { PageHeader } from './PageHeader'
 import { ListCard } from './ListCard'
 import { UserInterface } from '../../context/UserContext'
 import { useGetUserLists } from '../../lib/ReactQuery'
+import { ListCardSkeleton } from './ListCardSkeleton'
 
 export interface List {
   id:number
@@ -16,7 +17,7 @@ export interface List {
 
 export const ListPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
   const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useGetUserLists()
-  if (isLoading) return <h1>loading</h1>
+
   if (isError){
     console.log(error)
     return <h1>error</h1>
@@ -26,7 +27,12 @@ export const ListPage:React.FC<ComponentProps<'section'>> = ({...props}) => {
     <section {...props}>
         <PageHeader/>
         <h2>your lists</h2>
-        {data?.pages.map(page => {
+        {isLoading ?
+        Array(20).fill(0).map((_, index) => {
+          return <ListCardSkeleton key={'list-page' + index}/>
+        })
+        :
+        data?.pages.map(page => {
           if (page.results.length === 0) return <p>no lists</p>
           return page.results.map((list:List) => {
             return <ListCard key={list.id} list={list}/>

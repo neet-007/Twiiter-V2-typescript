@@ -2,7 +2,6 @@ import React, { ComponentProps, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useFollowList, useGetListMembers, useGetListTweets, useGetSingleList, useMemberList, useSearch } from '../../lib/ReactQuery'
 import { List } from './ListPage'
-import { Tweet, TweetCard } from '../../components/Shared/TweetCard/TweetCard'
 import { Button } from '../../components/Shared/Button/Button'
 import { UserInterface, useUserContext } from '../../context/UserContext'
 import { Modal } from '../../components/Shared/Modal/Modal'
@@ -10,6 +9,8 @@ import { ArrowLeft, Search } from 'react-bootstrap-icons'
 import { SectionSelector } from '../../components/Shared/SectionSelector/SectionSelector'
 import { UserIcon } from '../../components/Shared/UserIcon/UserIcon'
 import { useDebounce } from '../../hooks/useDebounce'
+import { InfiniteTweets } from '../../components/Shared/InfiniteTweets/InfiniteTweets'
+import { UserIconSkeleton } from '../../components/Shared/UserIcon/UserIconSkeleton'
 
 interface SearchInputProps extends ComponentProps<'form'>{
     value:string,
@@ -43,7 +44,6 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
   const {data:searchData, isLoading:searchIsLoading, isError:searchIsError, error:searchError, fetchNextPage:searchFetchNextPage, isFetchingNextPage:searchIsFetchingNextPage} = useSearch({q:value, f:'users', page, src:'typed_query'})
   const {mutateAsync:memberList, isPending} = useMemberList()
 
-  if(isLoading) return <p>loading</p>
   if(isError || searchIsError){
     console.log(error)
     console.log(searchError)
@@ -73,6 +73,11 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
       <SectionSelector section={section} sectionClick={setSection} buttonsArray={['members', 'suggested']}/>
       <div>
         {section === 'members' ?
+        isLoading ?
+        Array(20).fill(0).map((_,index) => {
+          return <UserIconSkeleton key={'list-members-skeleton' + listId + index}/>
+        })
+        :
         data?.pages.map(page => {
           if(page.results.length === 0) return <p>no members</p>
           return page.results.map((user:UserInterface) => {
@@ -83,7 +88,9 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
         <>
           <SearchInput value={value} setValue={setValue} handleSubmit={handleSubmit}/>
           {searchIsLoading ?
-          <p>loading</p>
+          Array(20).fill(0).map((_, index) => {
+            return <UserIconSkeleton key={'list-seatch' + listId + index}/>
+          })
           :
           searchData?.pages.map(page => {
             if(page.results.users.length === 0) return <p>no results</p>
@@ -104,7 +111,7 @@ export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
   const {listId} = useParams()
   const {mutateAsync:followList} = useFollowList()
   const {data, isLoading, isError, error} = useGetSingleList({listId:Number(listId)})
-  const {data:tweets, isLoading:tweetsIsLoading, isError:tweetsIsError, error:tweetsError} = useGetListTweets({listId:Number(listId)})
+  const {data:tweets, isLoading:tweetsIsLoading, isError:tweetsIsError, error:tweetsError, fetchNextPage:TweetFetchNextPage, isFetchingNextPage:TweetIsFetchingNextPage} = useGetListTweets({listId:Number(listId)})
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [editPage, setEditPage] = useState<0 | 1>(0)
@@ -171,17 +178,9 @@ export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
             }
         </div>
         {!(tweetsIsLoading || tweetsIsError)&&
-        <div>
-            {tweets?.pages[0].count === 0 ?
-            <p>no tweets yet</p>
-            :
-            tweets?.pages.map(page => page.results.map((tweet:Tweet) => {
-              return <TweetCard key={tweet.id} tweet={tweet}/>
-            }))
-            }
-        </div>
+        <InfiniteTweets data={tweets} isLoading={tweetsIsLoading} isError={tweetsIsError} error={tweetsError} fetchNextPage={TweetFetchNextPage} isFetchingNextPage={TweetIsFetchingNextPage}/>
         }
-        <Modal isOpen={isOpen}>
+        <Modal isOpen={isOpen} className=' bg-white'>
           <div ref={editListRef}>
             {editPage === 0 ?
             <form className='flex flex-col gap-2' onSubmit={handleSubmit}>

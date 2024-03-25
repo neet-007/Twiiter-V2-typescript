@@ -17,7 +17,10 @@ class Search(APIView):
         src = request.GET.get('src', 'typed_query')
 
         if not filter:
-            tweets = Tweet.objects.filter(text__icontains=search)
+            if search == '':
+                tweets = Tweet.objects.none()
+            else:
+                tweets = Tweet.objects.filter(text__icontains=search)
             users = UserProfile.objects.filter(user_name__icontains=search)[:3]
 
             return_dict = {'users':{'next':None, 'previous':None, 'pages':1, 'results':UserProfileSerlializer(users, many=True).data}}
@@ -38,19 +41,22 @@ class Search(APIView):
             return Response(return_dict, status=status.HTTP_200_OK)
 
         if filter == 'live':
-            if src == 'typed_query':
-                tweets = Tweet.objects.filter(text__icontains=search).order_by('-time')
-            elif src == 'hashtag_click':
-                tag = None
-                try:
-                    tag = Tag.objects.get(name=search)
-                except Tag.DoesNotExist:
-                    tweets = Tweet.objects.none()
-
-                if tag:
-                    tweets = tag.tweet_set.all()
+            if search == '':
+                tweets = Tweet.objects.none()
             else:
-                return Response({'error':'src is not supported'}, status=status.HTTP_400_BAD_REQUEST)
+                if src == 'typed_query':
+                    tweets = Tweet.objects.filter(text__icontains=search).order_by('-time')
+                elif src == 'hashtag_click':
+                    tag = None
+                    try:
+                        tag = Tag.objects.get(name=search)
+                    except Tag.DoesNotExist:
+                        tweets = Tweet.objects.none()
+
+                    if tag:
+                        tweets = tag.tweet_set.all()
+                else:
+                    return Response({'error':'src is not supported'}, status=status.HTTP_400_BAD_REQUEST)
 
             paginator = Paginator(tweets, 10)
             page_obj = paginator.page(page)
@@ -67,7 +73,11 @@ class Search(APIView):
             return Response(tweets_dict, status=status.HTTP_200_OK)
 
         if filter == 'users':
-            users = UserProfile.objects.filter(user_name__icontains=search)
+            if search == '':
+                users = UserProfile.objects.none()
+            else:
+                users = UserProfile.objects.filter(user_name__icontains=search)
+
             paginator = Paginator(UserProfileSerlializer(users, many=True).data, 10)
             page_obj = paginator.page(page)
 
@@ -84,7 +94,11 @@ class Search(APIView):
             return Response(users_dict, status=status.HTTP_200_OK)
 
         if filter == 'lists':
-            lists = List.objects.filter(name__icontains=search)
+            if search == '':
+                lists = List.objects.none()
+            else:
+                lists = List.objects.filter(name__icontains=search)
+
             paginator = Paginator(lists, 10)
             page_obj = paginator.page(page)
 

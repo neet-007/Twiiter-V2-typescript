@@ -31,7 +31,7 @@ class TweetViewset(ModelViewSet):
             user_ = None
 
         if type == 'for-you':
-            paginator = Paginator(Tweet.objects.all(), per_page=20)
+            paginator = Paginator(Tweet.objects.all().order_by('-time'), per_page=20)
         elif type == 'following':
             try:
                 user = UserProfile.objects.get(user=request.user)
