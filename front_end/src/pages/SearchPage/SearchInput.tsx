@@ -39,7 +39,7 @@ export const SearchInput:React.FC<SearchInputProps> = ({handleSubmit}) => {
   const [value, setValue] = useState<string>('')
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const debounce = useDebounce(value)
-  const {data, isLoading, isError, error} = useSearch({q:debounce, f:'users', page:1})
+  const {data, isLoading, isError, error} = useSearch({q:debounce, f:'users', page:1, src:'typed_query'})
 
 
   return (

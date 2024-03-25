@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers } from "./Axios";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers, memberList } from "./Axios";
 import { Tweet } from "../components/Shared/TweetCard/TweetCard";
 
 export function useRegister(){
@@ -138,6 +138,18 @@ export function useFollowList(){
         mutationFn:({listId, isFollowed}:{listId:number, isFollowed:boolean}) => followList({listId, isFollowed}),
         onSuccess:(data, {listId}) => {
             queryclient.invalidateQueries({queryKey:['list', listId]})
+            queryclient.invalidateQueries({queryKey:['list-followers', listId]})
+        }
+    })
+}
+
+export function useMemberList(){
+    const queryclient = useQueryClient()
+    return useMutation({
+        mutationFn:({listId, isMember, userId}:{listId:number, isMember:boolean, userId:number}) => memberList({listId, isMember, userId}),
+        onSuccess:(data, {listId}) => {
+            queryclient.invalidateQueries({queryKey:['list', listId]})
+            queryclient.invalidateQueries({queryKey:['list-members', listId]})
         }
     })
 }
@@ -162,7 +174,7 @@ export function useGetListMembers({listId}:{listId:number}){
 
 export function useGetListFollowers({listId}:{listId:number}){
     return useInfiniteQuery({
-        queryKey:['list-members', listId],
+        queryKey:['list-followers', listId],
         initialPageParam:1,
         getNextPageParam:(lastPage) => lastPage.next,
         queryFn:() => getListFollowers({listId})

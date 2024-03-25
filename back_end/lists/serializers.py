@@ -7,18 +7,19 @@ class ListSerializer(ModelSerializer):
     is_followed = SerializerMethodField(method_name='get_is_followed')
     class Meta:
         model = List
-        exclude = ('members', 'followers')
+        fields = '__all__'
         extra_kwargs = {
             'name':{'required':False},
             'description':{'required':False},
             'followers':{'required':False},
-            'members':{'required':False},
-            'private':{'required':False},
+            'members':{'required':False, 'write_only':True},
+            'private':{'required':False, 'write_only':True},
             'followers_num':{'required':False},
             'members_num':{'required':False},
         }
 
     def validate(self, attrs):
+        print(attrs)
         attrs['list_creator'] = self.context.get('creator')
         return super().validate(attrs)
 
@@ -30,6 +31,7 @@ class ListSerializer(ModelSerializer):
 
     def add_member(self, validated_data):
         #validated_data['member'] = validated_data.pop('member')
+        print(validated_data)
         return self.Meta.model.objects.add_member(user=validated_data['members'], list=self.context.get('list'))
 
     def remove_member(self, validated_data):

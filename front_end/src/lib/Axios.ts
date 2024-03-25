@@ -199,7 +199,6 @@ export async function getSingleList({listId}:{listId:number}){
 
 export async function followList({listId, isFollowed}:{listId:number, isFollowed:boolean}){
     try {
-        console.log(isFollowed)
         if(isFollowed)
         {
             let res = await axios.post(`/api/lists/list/${listId}/unfollow/`, {}, config)
@@ -207,6 +206,22 @@ export async function followList({listId, isFollowed}:{listId:number, isFollowed
             return res.data
         }
         let res = await axios.post(`/api/lists/list/${listId}/follow/`, {}, config)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function memberList({listId, isMember, userId}:{listId:number, isMember:boolean, userId:number}){
+    try {
+        if(isMember)
+        {
+            let res = await axios.post(`/api/lists/list/${listId}/remove_member/`, {members:[userId]}, config)
+            console.log(res)
+            return res.data
+        }
+        let res = await axios.post(`/api/lists/list/${listId}/add_member/`, {members:[userId]}, config)
         console.log(res)
         return res.data
     } catch (error) {

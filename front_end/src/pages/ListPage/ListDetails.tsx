@@ -1,6 +1,6 @@
 import React, { ComponentProps, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useFollowList, useGetListMembers, useGetListTweets, useGetSingleList, useSearch } from '../../lib/ReactQuery'
+import { useFollowList, useGetListMembers, useGetListTweets, useGetSingleList, useMemberList, useSearch } from '../../lib/ReactQuery'
 import { List } from './ListPage'
 import { Tweet, TweetCard } from '../../components/Shared/TweetCard/TweetCard'
 import { Button } from '../../components/Shared/Button/Button'
@@ -41,7 +41,8 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
   const [page, setPage] = useState<number>(1)
   const {data, isLoading, isError, error, fetchNextPage, isFetchingNextPage} = useGetListMembers({listId})
   const {data:searchData, isLoading:searchIsLoading, isError:searchIsError, error:searchError, fetchNextPage:searchFetchNextPage, isFetchingNextPage:searchIsFetchingNextPage} = useSearch({q:value, f:'users', page, src:'typed_query'})
-  console.log(searchData)
+  const {mutateAsync:memberList, isPending} = useMemberList()
+
   if(isLoading) return <p>loading</p>
   if(isError || searchIsError){
     console.log(error)
@@ -53,6 +54,12 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
     if(e){
       e.preventDefault()
     }
+  }
+
+  function handleOption(e:React.MouseEvent<HTMLButtonElement>, userId:number, condition:boolean){
+    e.preventDefault()
+    if (isPending) return
+    memberList({listId, isMember:condition, userId})
   }
 
   return(
@@ -69,7 +76,7 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
         data?.pages.map(page => {
           if(page.results.length === 0) return <p>no members</p>
           return page.results.map((user:UserInterface) => {
-            return <UserIcon key={listId + user.id!} user={user}/>
+            return <UserIcon key={listId + user.id!} user={user} option={{option:'list', condition:false}} handleOption={handleOption}/>
           })
         })
         :
@@ -81,7 +88,7 @@ export const ListEditMembers:React.FC<ListEditMembersProps> = ({listId, setEditP
           searchData?.pages.map(page => {
             if(page.results.users.length === 0) return <p>no results</p>
             return page.results.users.map((user:UserInterface) => {
-              return <UserIcon key={listId + user.id!} user={user}/>
+              return <UserIcon key={listId + user.id!} user={user} option={{option:'list', condition:true}} handleOption={handleOption}/>
             })
           })
           }
@@ -114,15 +121,20 @@ export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
   function handleSubmit(e:React.FormEvent<HTMLFormElement>){
     e.preventDefault()
     if(editListRef.current){
-      const a = editListRef.current?.children[0].children[2].children[1]
-      const b =editListRef.current.children[0].children[3].children[1]
+      const a = editListRef.current?.children[0].children[2].children[1] as HTMLInputElement
+      const b =editListRef.current.children[0].children[3].children[1] as HTMLInputElement
       console.log(a.value)
       console.log(b.value)
     }
   }
 
+  function handleModalClick(e:React.MouseEvent<HTMLTableSectionElement>){
+    if(e.target instanceof HTMLElement && e.target.id === 'modal-overlay')
+      setIsOpen(false)
+  }
+
   return (
-    <section>
+    <section onClick={handleModalClick}>
         <header>header</header>
         <div className=' flex flex-col items-center'>
             <p>{list.name}</p>
@@ -147,7 +159,7 @@ export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
               </div>
             </div>
             {list.list_creator.id === user.id ?
-            <Button onClick={() => setIsOpen(true)}>edit profile</Button>
+            <Button onClick={() => setIsOpen(true)}>edit list</Button>
             :
             <Button onClick={() => followList({listId:list.id, isFollowed:list.is_followed})}>
               {list.is_followed ?
@@ -174,7 +186,7 @@ export const ListDetails:React.FC<ComponentProps<'section'>> = () => {
             {editPage === 0 ?
             <form className='flex flex-col gap-2' onSubmit={handleSubmit}>
               <div className=' flex gap-4 items-center'>
-                <button>
+                <button type='button' onClick={() => setIsOpen(false)}>
                   <ArrowLeft/>
                 </button>
                 <p>edit list</p>
