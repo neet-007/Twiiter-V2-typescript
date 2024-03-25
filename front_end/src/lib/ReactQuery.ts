@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList } from "./Axios";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers } from "./Axios";
 import { Tweet } from "../components/Shared/TweetCard/TweetCard";
 
 export function useRegister(){
@@ -142,12 +142,30 @@ export function useFollowList(){
     })
 }
 
-export function useGetListTweets({listId, pageParam}:{listId:number, pageParam?:number}){
+export function useGetListTweets({listId}:{listId:number}){
     return useInfiniteQuery({
         queryKey:['list', 'list-tweets', listId],
         initialPageParam:1,
         getNextPageParam:(lastPage) => lastPage.next,
         queryFn:() => getListTweets({listId})
+    })
+}
+
+export function useGetListMembers({listId}:{listId:number}){
+    return useInfiniteQuery({
+        queryKey:['list-members', listId],
+        initialPageParam:1,
+        getNextPageParam:(lastPage) => lastPage.next,
+        queryFn:() => getListMembers({listId})
+    })
+}
+
+export function useGetListFollowers({listId}:{listId:number}){
+    return useInfiniteQuery({
+        queryKey:['list-members', listId],
+        initialPageParam:1,
+        getNextPageParam:(lastPage) => lastPage.next,
+        queryFn:() => getListFollowers({listId})
     })
 }
 

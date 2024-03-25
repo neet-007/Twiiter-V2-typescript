@@ -7,7 +7,7 @@ class ListSerializer(ModelSerializer):
     is_followed = SerializerMethodField(method_name='get_is_followed')
     class Meta:
         model = List
-        fields = '__all__'
+        exclude = ('members', 'followers')
         extra_kwargs = {
             'name':{'required':False},
             'description':{'required':False},

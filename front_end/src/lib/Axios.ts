@@ -224,6 +224,26 @@ export async function getListTweets({listId, pageParam=1}:{listId:number, pagePa
     }
 }
 
+export async function getListMembers({listId, pageParam=1}:{listId:number, pageParam?:number}){
+    try {
+        let res = await axios.get(`/api/lists/list/${listId}/members/?page=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function getListFollowers({listId, pageParam=1}:{listId:number, pageParam?:number}){
+    try {
+        let res = await axios.get(`/api/lists/list/${listId}/followers/?page=${pageParam}`)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export async function search({q, f, src, page=1}:{q:string, f?:'live' | 'users' | 'lists', src?:'typed_query' | 'hashtag_click', page:number}){
     try {
         let res = await axios.get(`/api/search/?q=${q}${f ? `&f=${f}`:''}${src ? `&src=${src}`:''}&page=${page}`)

@@ -7,6 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from tweets.models import Tweet
 from tweets.serializers import TweetSerializer
 from user_auth.models import UserProfile
+from user_auth.serializers import UserProfileSerlializer
 from .models import List
 from .serializers import ListSerializer
 # Create your views here.
@@ -38,6 +39,47 @@ class ListViewset(ModelViewSet):
         page_obj = paginator.page(page)
 
         return_dict = {'next':None, 'previous':None, 'results':ListSerializer(page_obj.object_list, many=True, context={'userr':request.user}).data, 'pages':paginator.num_pages, 'count':paginator.count}
+
+        if page_obj.has_next():
+            return_dict['next'] = page_obj.next_page_number()
+        if page_obj.has_previous():
+            return_dict['previous'] = page_obj.previous_page_number()
+
+        return Response(return_dict, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True)
+    def members(self, request, pk):
+        page = request.GET.get('page', 1)
+        print(page)
+        try:
+            list = List.objects.get(pk=pk)
+        except List.DoesNotExist:
+            return Response({'error':'list not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        paginator = Paginator(list.members.all(), per_page=20)
+        page_obj = paginator.page(page)
+
+        return_dict = {'next':None, 'previous':None, 'results':UserProfileSerlializer(page_obj.object_list, many=True).data, 'pages':paginator.num_pages, 'count':paginator.count}
+
+        if page_obj.has_next():
+            return_dict['next'] = page_obj.next_page_number()
+        if page_obj.has_previous():
+            return_dict['previous'] = page_obj.previous_page_number()
+
+        return Response(return_dict, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True)
+    def followers(self, request, pk):
+        page = request.GET.get('page', 1)
+        try:
+            list = List.objects.get(pk=pk)
+        except List.DoesNotExist:
+            return Response({'error':'list not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        paginator = Paginator(list.followers.all(), per_page=20)
+        page_obj = paginator.page(page)
+
+        return_dict = {'next':None, 'previous':None, 'results':UserProfileSerlializer(page_obj.object_list, many=True).data, 'pages':paginator.num_pages, 'count':paginator.count}
 
         if page_obj.has_next():
             return_dict['next'] = page_obj.next_page_number()
