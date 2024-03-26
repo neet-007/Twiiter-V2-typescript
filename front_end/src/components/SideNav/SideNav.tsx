@@ -3,7 +3,7 @@ import { Button } from "../Shared/Button/Button"
 import { UserIcon } from "../Shared/UserIcon/UserIcon"
 import { useUserContext } from "../../context/UserContext"
 import { Link } from "react-router-dom"
-import { ArrowLeft, Bell, HouseDoor, JournalText, Person, Search, TwitterX } from "react-bootstrap-icons"
+import { ArrowLeft, Bell, Bookmark, HouseDoor, JournalText, Person, Search, TwitterX } from "react-bootstrap-icons"
 import { Modal } from "../Shared/Modal/Modal"
 import { modalClick } from "../../utils/modalClick"
 import { TweetInput } from "../Shared/TweetInput/TweetInput"
@@ -56,6 +56,14 @@ export const SideNav:React.FC<ComponentProps<'nav'>> = ({className, ...props}) =
                 <Person size={20}/>
                 <p className=" hidden md:block">
                   profile
+                </p>
+              </Link>
+            </li>
+            <li>
+              <Link to={'/bookmarks'} className=" p-2 flex gap-2 items-center">
+                <Bookmark size={20}/>
+                <p className=" hidden md:block">
+                  bookmark
                 </p>
               </Link>
             </li>

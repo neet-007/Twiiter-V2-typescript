@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers, memberList } from "./Axios";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers, memberList, getUserBookmakrs } from "./Axios";
 import { Tweet } from "../components/Shared/TweetCard/TweetCard";
 
 export function useRegister(){
@@ -34,10 +34,21 @@ export function useGetMainPageTweets(){
     })
 }
 */
-export function useGetUserProfile({userMention, page}:{userMention?:string, page:number}){
-    return useQuery({
-        queryKey:['user-profile', userMention, page],
-        queryFn:() => getUserProfile({userMention, page})
+export function useGetUserProfile({userMention, f}:{userMention?:string, f:string}){
+    return useInfiniteQuery({
+        queryKey:['user-profile', userMention, f],
+        initialPageParam:1,
+        queryFn:({queryKey, pageParam}) => getUserProfile({userMention:queryKey[1], f:queryKey[2]!, pageParam}),
+        getNextPageParam:(lastPage) => lastPage.next
+    })
+}
+
+export function useGetUserBookmarks({userMention}:{userMention?:string}){
+    return useInfiniteQuery({
+        queryKey:['user-bookmark', userMention],
+        initialPageParam:1,
+        queryFn:({queryKey, pageParam}) => getUserBookmakrs({userMention:queryKey[1], pageParam}),
+        getNextPageParam:(lastPage) => lastPage.next
     })
 }
 

@@ -28,7 +28,7 @@ export const SideNav:React.FC<SideNavProps> = ({isOpen}) => {
                 </div>
                 <div className='flex flex-col'>
                     <Link to={`/profile/${user.mention}`}>{user.user_name}</Link>
-                    <Link to={`/profile/${user.mention}`}>{user.mention}</Link>
+                    <Link to={`/profile/${user.mention}`}>@{user.mention}</Link>
                 </div>
                 <div className=' flex gap-4'>
                     <p>{user.following}following</p>

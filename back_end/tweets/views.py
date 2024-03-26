@@ -55,8 +55,9 @@ class TweetViewset(ModelViewSet):
         return Response(return_dict, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False)
-    def get_user_profile(self, request):
+    def profile(self, request):
         page = request.GET.get('page', 1)
+        filter = request.GET.get('f', 'posts')
         user_mention = request.GET.get('user-mention')
 
         try:
@@ -66,7 +67,19 @@ class TweetViewset(ModelViewSet):
 
         return_dict = {'user':{}, 'results':[], 'next':None, 'previous':None, 'page':page}
 
-        paginator = Paginator(Tweet.objects.filter(user=user_), per_page=10)
+        tweets = Tweet.objects.none()
+        is_liked = False
+        if filter == 'posts':
+            tweets = Tweet.objects.filter(user=user_, is_reply=False)
+
+        if filter == 'likes':
+            tweets = [tweet.tweet for tweet in Like.objects.filter(user=user_).prefetch_related('tweet')]
+            is_liked = True
+
+        if filter == 'replies':
+            Tweet.objects.filter(user=user_)
+
+        paginator = Paginator(tweets, per_page=10)
         page_obj = paginator.page(page)
 
         if page_obj.has_next():
@@ -75,9 +88,9 @@ class TweetViewset(ModelViewSet):
             return_dict['previous'] = page_obj.previous_page_number()
 
         return_dict['user'] = UserProfileSerlializer(user_, context={'user':request.user}).data
-        return_dict['results'] = TweetSerializer(page_obj.object_list, many=True, context={'user_get':user_}).data
+        return_dict['results'] = TweetSerializer(page_obj.object_list, many=True, context={'user_get':user_, 'is_liked':is_liked}).data
 
-        return Response({'success':return_dict}, status=status.HTTP_200_OK)
+        return Response(return_dict, status=status.HTTP_200_OK)
 
     @action(methods=['get', 'post'], detail=True)
     def comments(self, request, pk):
@@ -107,7 +120,7 @@ class TweetViewset(ModelViewSet):
             return Response({'error':'userprofile does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
         serialized_data = CommmentsSerializer(data=request.data, context={'user':user, 'tweet_replied_to':pk})
-        print('hheeeeeerr')
+
         if serialized_data.is_valid():
             comment = serialized_data.create(serialized_data.validated_data)
             return Response(TweetSerializer(comment).data, status=status.HTTP_201_CREATED)
@@ -154,6 +167,29 @@ class BookmarkViewset(ModelViewSet):
 
         return Response({'tweet_id':tweet.pk}, status=status.HTTP_201_CREATED)
 
+    @action(methods=['get'], detail=False)
+    def user(self, request):
+        page = request.GET.get('page', 1)
+        try:
+            user = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({'error':'user does not have profile'}, status=status.HTTP_400_BAD_REQUEST)
+
+        tweets = Bookmark.objects.filter(user=user).prefetch_related('tweet')
+        tweets = [tweet.tweet for tweet in tweets]
+
+        paginator = Paginator(tweets, per_page=20)
+        page_obj = paginator.page(page)
+
+        return_dict = {'next':None, 'previous':None, 'results':TweetSerializer(page_obj.object_list, many=True, context={'is_bookmarked':True, 'user_get':user}).data, 'count':paginator.count, 'pages':paginator.num_pages}
+
+        if page_obj.has_next():
+            return_dict['next'] = page_obj.next_page_number()
+        if page_obj.has_previous():
+            return_dict['previous'] = page_obj.previous_page_number()
+
+        return Response(return_dict, status=status.HTTP_200_OK)
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['user'] = self.request.user
@@ -183,6 +219,36 @@ class LikeViewset(ModelViewSet):
         like.delete()
 
         return Response({'tweet_id':tweet.pk}, status=status.HTTP_201_CREATED)
+
+    @action(methods=['get'], detail=False)
+    def user(self, request):
+        page = request.GET.get('page', 1)
+        user = request.GET.get('user')
+
+        if not user:
+            if isinstance(request.user, AnonymousUser):
+                return Response({'error':'user does not exists'}, status=status.HTTP_404_NOT_FOUND)
+        user = request.user
+
+        try:
+            user = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            return Response({'error':'user does not have profile'}, status=status.HTTP_400_BAD_REQUEST)
+
+        tweets = Like.objects.filter(user=user).prefetch_related('tweet')
+        tweets = [tweet.tweet for tweet in tweets]
+
+        paginator = Paginator(tweets, per_page=20)
+        page_obj = paginator.page(page)
+
+        return_dict = {'next':None, 'previous':None, 'results':TweetSerializer(page_obj.object_list, many=True).data, 'count':paginator.count, 'pages':paginator.num_pages}
+
+        if page_obj.has_next():
+            return_dict['previous'] = page_obj.next_page_number()
+        if page_obj.has_previous():
+            return_dict['previous'] = page_obj.previous_page_number()
+
+        return Response(return_dict, status=status.HTTP_200_OK)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

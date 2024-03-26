@@ -46,11 +46,15 @@ class TweetSerializer(ModelSerializer):
         return self.Meta.model.objects.create_tweet(**validated_data)
 
     def get_is_liked(self, obj):
+        if 'is_liked' in self.context:
+            return self.context.get('is_liked')
         if not self.context.get('user_get'):
             return False
         return Like.objects.filter(user=self.context.get('user_get'), tweet=obj).exists()
 
     def get_is_bookmarked(self, obj):
+        if 'is_bookmarked' in self.context:
+            return self.context.get('is_bookmarked')
         if not self.context.get('user_get'):
             return False
         return Bookmark.objects.filter(user=self.context.get('user_get'), tweet=obj).exists()

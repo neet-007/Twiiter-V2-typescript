@@ -15,6 +15,7 @@ import { SearchBar } from "./components/SearchBar/SearchBar"
 import { SideNav as MobileSideNav } from "./components/Mobile/SideNav"
 import React, { useState } from "react"
 import { Header } from "./components/Mobile/Header"
+import { BookmarkPage } from "./pages/BookmarkPage/BookmarkPage"
 function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false)
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="notification" element={<NotificationsPage/>}/>
           <Route path="profile/:userMention" element={<UserDetailsPage/>}/>
           <Route path="lists" element={<ListPage/>}/>
+          <Route path="bookmarks" element={<BookmarkPage/>}/>
           <Route path="list/:listId" element={<ListDetails/>}/>
           <Route path="post/:tweetId" element={<PostPage/>}/>
             <Route path="auth/register" element={<Register/>}/>

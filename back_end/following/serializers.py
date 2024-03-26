@@ -18,6 +18,10 @@ class FollowsSerializer(ModelSerializer):
         unfollow = False
         if 'unfollow' in validated_data:
             unfollow = validated_data.pop('unfollow')
+
         if unfollow:
-            return self.Meta.model.objects.unfollow(**validated_data)
-        return self.Meta.model.objects.create(**validated_data)
+            self.Meta.model.objects.unfollow(**validated_data)
+            return True
+
+        self.Meta.model.objects.create(**validated_data)
+        return True

@@ -137,10 +137,20 @@ export async function makePostComment({tweetId, text}:{tweetId:number, text:stri
     }
 }
 
-export async function getUserProfile({userMention, page=1}:{userMention?:string, page:number}) {
+export async function getUserProfile({userMention, f, pageParam=1}:{userMention?:string, f:string, pageParam:number}) {
     try {
-        let res = await axios.get(`/api/tweets/tweet/get_user_profile?page=${page}&${userMention ? `user-mention=${userMention}`: ''}/`)
+        let res = await axios.get(`/api/tweets/tweet/profile?page=${pageParam}&f=${f}${userMention ? `&user-mention=${userMention}`: ''}/`)
         console.log(res.data)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function getUserBookmakrs({userMention, pageParam=1}:{userMention?:string, pageParam:number}){
+    try {
+        let res = await axios.get(`/api/tweets/bookmark/user/?page=${pageParam}&user-mention=${userMention}`)
+        console.log(res)
         return res.data
     } catch (error) {
         console.log(error)

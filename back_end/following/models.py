@@ -17,6 +17,7 @@ class FollowsManager(models.Manager):
         except UserProfile.DoesNotExist:
             raise ValueError('follower user does not exist')
         """
+
         follow = Follows(following=following, follower=follower)
         follow.save()
 
