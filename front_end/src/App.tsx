@@ -12,11 +12,21 @@ import { BottomBar } from "./components/Mobile/BottomBar"
 import { PostPage } from "./pages/PostPage/PostPage"
 import { ListDetails } from "./pages/ListPage/ListDetails"
 import { SearchBar } from "./components/SearchBar/SearchBar"
-
+import { SideNav as MobileSideNav } from "./components/Mobile/SideNav"
+import React, { useState } from "react"
+import { Header } from "./components/Mobile/Header"
 function App() {
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false)
+
+  function handleMobileSideNav(e:React.MouseEvent<HTMLElement>){
+    const E = e.target as HTMLElement
+    if(E.id === 'mobile-side-nav') setIsMobileNavOpen(false)
+  }
 
   return (
-    <div className=" flex relative">
+    <div className=" flex relative" onClick={handleMobileSideNav}>
+      <Header setIsMobileNavOpen={setIsMobileNavOpen}/>
+      <MobileSideNav isOpen={isMobileNavOpen}/>
       <SideNav className="fixed hidden sm:flex"/>
       <main className="h-dvh relative ml-[0%] sm:ml-[20%] w-full lg:w-[50%]">
         <Routes>
