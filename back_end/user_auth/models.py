@@ -52,31 +52,29 @@ class UserProfile(models.Model):
     following = models.PositiveIntegerField(default=0)
     join_data = models.DateField(auto_now_add=True)
 
-    def save(self, *args, **kwargs) -> None:
-        VerificationTokens.objects.create(user=self.user)
-        return super().save(*args, **kwargs)
-
 class VerificationTokensManager(models.Manager):
     def create(self, user:UserModel) -> 'VerificationTokens':
         token_ = VerificationTokens(user=user)
 
-        mail_user(subject='verify your email', body='', to=[user.email])
+        mail_user(subject='verify your email', body=f'verfiy your email in this link http://localhost:5173/auth/verification/{token_.token}', to=[user.email])
 
         token_.save()
         return token_
 
     def check_user_token(self, user:UserModel, token:uuid4) -> None:
         try:
-            token_ = self.get(user=user, token=token)
+            token_ = VerificationTokens.objects.get(user=user, token=token)
         except VerificationTokens.DoesNotExist:
             return False
 
+        user.email_verified = True
+        user.save()
         token_.delete()
 
         return True
 
 class VerificationTokens(models.Model):
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    token = models.UUIDField(default=uuid4, blank=True)
+    user = models.OneToOneField(UserModel, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid4, blank=True, unique=True)
 
     objects = VerificationTokensManager()

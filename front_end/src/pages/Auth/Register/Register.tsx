@@ -3,10 +3,11 @@ import { useLogin, useRegister } from '../../../lib/ReactQuery'
 import { Button } from '../../../components/Shared/Button/Button'
 import { useUserContext } from '../../../context/UserContext'
 import { useNavigate } from 'react-router-dom'
+import { CSRF } from '../../../components/Shared/CSRFToken/CSRFToken'
  
 export const Register:React.FC<ComponentProps<'section'>> = () => {
     const navigate = useNavigate()
-    const {isAuthenticated, checkUser} = useUserContext()
+    const {hasProfile, emailVerified, isAuthenticated, checkUser} = useUserContext()
     const {mutateAsync:register} = useRegister()
     const {mutateAsync:login} = useLogin()
     const emailRef = useRef<HTMLInputElement>(null)
@@ -14,8 +15,10 @@ export const Register:React.FC<ComponentProps<'section'>> = () => {
     const rePasswordRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
-        if(isAuthenticated) navigate('/')
-    },[isAuthenticated])
+        if(hasProfile) navigate('/')
+        if(emailVerified) navigate('/auth/make-profile')
+        if(isAuthenticated) navigate('/auth/reverify')
+    },[hasProfile, emailVerified, isAuthenticated])
 
     function handleSubmit(e:React.FormEvent<HTMLFormElement>){
         e.preventDefault()
@@ -28,7 +31,7 @@ export const Register:React.FC<ComponentProps<'section'>> = () => {
                 .then(res => {
                     if('error' in res) return console.log(res.error)
                     checkUser()
-                    navigate('/auth/make-profile')
+                    alert('check your email')
                 })
             }
         })
@@ -36,6 +39,7 @@ export const Register:React.FC<ComponentProps<'section'>> = () => {
 return (
     <section>
         <form onSubmit={handleSubmit}>
+            <CSRF/>
             <div className='flex flex-col g-3'>
                 <label htmlFor="email">email</label>
                 <input type="email" name='email' ref={emailRef}/>

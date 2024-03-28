@@ -8,7 +8,6 @@ export interface UserInterface{
     bio:string | undefined,
     following:number | undefined,
     followers:number | undefined,
-    is_verified:boolean,
     is_followed:boolean
 }
 
@@ -19,32 +18,33 @@ const INITAIL_USER = {
     bio:undefined,
     following:undefined,
     followers:undefined,
-    is_verified:false,
     is_followed:false
 }
 
 interface ContextType{
     user: UserInterface
     setUser:React.Dispatch<React.SetStateAction<any>>
-    isAuthenticated:boolean
+    isAuthenticated:boolean | undefined
     setIsAuthenticated:React.Dispatch<React.SetStateAction<any>>
-    isLoading:boolean
+    isLoading:boolean | undefined
     setIsLoading:React.Dispatch<React.SetStateAction<any>>
-    hasProfile:boolean
+    hasProfile:boolean | undefined
     setHasProfile:React.Dispatch<React.SetStateAction<any>>
     checkUser:() => void
+    emailVerified:boolean | undefined
 }
 
 const INITAIL_STATE = {
     user:INITAIL_USER,
     setUser:() => {},
-    isAuthenticated:false,
+    isAuthenticated:undefined,
     setIsAuthenticated:() => {},
     isLoading:true,
     setIsLoading:() => {},
-    hasProfile:false,
+    hasProfile:undefined,
     setHasProfile:() => {},
-    checkUser:() => {}
+    checkUser:() => {},
+    emailVerified:undefined
 }
 
 
@@ -56,6 +56,7 @@ export const UserContextProvider:React.FC<ComponentProps<'div'>> = ({children}) 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [hasProfile, setHasProfile] = useState<boolean>(false)
+    const [emailVerified, setEmailVerified] = useState<boolean>(false)
 
     function checkUser(){
         getCheckUser()
@@ -64,12 +65,14 @@ export const UserContextProvider:React.FC<ComponentProps<'div'>> = ({children}) 
                 if(!res.success.profile){
                     setHasProfile(false)
                     setIsAuthenticated(true)
+                    setEmailVerified(res.success.user.email_verified)
                     setIsLoading(false)
                 }
                 else{
                     setUser(res.success.profile)
                     setHasProfile(true)
                     setIsAuthenticated(true)
+                    setEmailVerified(true)
                     setIsLoading(false)
                 }
             })
@@ -88,7 +91,8 @@ export const UserContextProvider:React.FC<ComponentProps<'div'>> = ({children}) 
         setIsLoading,
         hasProfile,
         setHasProfile,
-        checkUser
+        checkUser,
+        emailVerified
     }
     return(
         <UserContext.Provider value={value}>

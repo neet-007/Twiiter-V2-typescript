@@ -8,8 +8,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator, EmptyPage
 from user_auth.models import UserProfile
 from user_auth.serializers import UserProfileSerlializer
-from .models import Tweet, Bookmark, Like
-from .serializers import TweetSerializer, BookmarkSerializer, LikeSerializer, CommmentsSerializer
+from .models import Tweet, Bookmark, Like, Tag
+from .serializers import TweetSerializer, BookmarkSerializer, LikeSerializer, CommmentsSerializer, TagSerializer
 from .pagination import TweetsPaginator
 from following.models import Follows
 # Create your views here.
@@ -25,14 +25,17 @@ class TweetViewset(ModelViewSet):
         page = request.GET.get('page', 1)
         type = request.GET.get('type', 'for-you')
 
-        try:
-            user_ = UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
-            user_ = None
+        user_ = None
 
-        if type == 'for-you':
+        if isinstance(request.user, user_model):
+            try:
+                user_ = UserProfile.objects.get(user=request.user)
+            except UserProfile.DoesNotExist:
+                user_ = None
+
+        if type == 'for-you' or (type == 'following' and user_):
             paginator = Paginator(Tweet.objects.all().order_by('-time'), per_page=20)
-        elif type == 'following':
+        elif type == 'following' and user_:
             try:
                 user = UserProfile.objects.get(user=request.user)
             except UserProfile.DoesNotExist:
@@ -53,6 +56,13 @@ class TweetViewset(ModelViewSet):
         return_dict['results'] = TweetSerializer(page_obj.object_list, many=True, context={'user_get':user_}).data
 
         return Response(return_dict, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def trending(self, request):
+        users = UserProfile.objects.all()[:3]
+        trends = Tag.objects.all()[:5]
+
+        return Response({'users':UserProfileSerlializer(users, many=True).data, 'trends':TagSerializer(trends, many=True).data}, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False)
     def profile(self, request):
@@ -170,6 +180,10 @@ class BookmarkViewset(ModelViewSet):
     @action(methods=['get'], detail=False)
     def user(self, request):
         page = request.GET.get('page', 1)
+
+        if isinstance(request.user, AnonymousUser):
+            return Response({'error':'user is not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+
         try:
             user = UserProfile.objects.get(user=request.user)
         except UserProfile.DoesNotExist:

@@ -4,6 +4,9 @@ import { useBookmarkTweet, useLikeTweet } from '../../../lib/ReactQuery'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { UserInterface } from '../../../context/UserContext'
 import { twitterStyleTime } from '../../../utils/twiiterStyleTime'
+import { Modal } from '../Modal/Modal'
+import { modalClick } from '../../../utils/modalClick'
+import { TweetInput } from '../TweetInput/TweetInput'
 
 export interface Tweet{
     id:number
@@ -21,15 +24,17 @@ export interface Tweet{
 
 interface TweetCardProps extends ComponentProps<'article'>{
     tweet:Tweet
+    comment?:boolean
 }
 
-export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
+export const TweetCard:React.FC<TweetCardProps> = ({tweet, comment}) => {
   const {mutate:likeFunc, isPending:isPendingLike, isError:isErrorLike, isSuccess:isSuccessLike} = useLikeTweet()
   const {mutateAsync:bookmarkFunc, isPending:isPendingBook, isError:isErrorBook, isSuccess:isSuccessBook} = useBookmarkTweet()
   const navigate = useNavigate()
   const {pathname} = useLocation()
   const [like, setLike] = useState<{isLike:boolean, likes:number}>({isLike:tweet.is_liked, likes:tweet.likes})
   const [bookmark, setBookmark] = useState<{isBookmark:boolean, bookmarks:number}>({isBookmark:tweet.is_bookmarked, bookmarks:tweet.bookmarks})
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if(isErrorLike)setLike(prev => ({...prev, isLike:tweet.is_liked, likes:tweet.likes}))
@@ -49,7 +54,7 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
   }
 
   return (
-    <article className='flex gap-2'>
+    <article className='flex gap-2' onClick={e => modalClick(e, setIsOpen)}>
         <div>{tweet.user.user_name}</div>
         <div className='w-full'>
           <div onClick={() => pathname.includes('/path/') ? () => {} : navigate(`/post/${tweet.id}`)}>
@@ -67,8 +72,12 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
             })
             }</div>
             <div>{tweet.img}</div>
+            {!comment &&
             <div className='flex justify-between'>
-                <div className='flex items-center justify-center gap-2'><Chat/>{tweet.replies}</div>
+                <div className='flex items-center justify-center gap-2'>
+                  <Chat onClick={() => setIsOpen(true)}/>
+                  {tweet.replies}
+                  </div>
                 <div className='flex items-center justify-center gap-2'>
                     {like.isLike?
                         <HeartFill fill='red' onClick={handleLike}/>
@@ -86,7 +95,12 @@ export const TweetCard:React.FC<TweetCardProps> = ({tweet}) => {
                     {bookmark.bookmarks}
                     </div>
             </div>
+            }
         </div>
+        <Modal isOpen={isOpen} className=' bg-white flex flex-col gap-8'>
+            <TweetCard tweet={tweet} comment/>
+            <TweetInput tweetId={tweet.id}/>
+        </Modal>
     </article>
   )
 }

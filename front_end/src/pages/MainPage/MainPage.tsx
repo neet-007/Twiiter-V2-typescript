@@ -1,7 +1,6 @@
 import React, { ComponentProps, useState } from 'react'
 import { SectionSelector } from '../../components/Shared/SectionSelector/SectionSelector'
 import { TweetInput } from '../../components/Shared/TweetInput/TweetInput'
-import { TopBar } from './TopBar'
 import { useGetMainPageTweets } from '../../lib/ReactQuery'
 import { InfiniteTweets } from '../../components/Shared/InfiniteTweets/InfiniteTweets'
 

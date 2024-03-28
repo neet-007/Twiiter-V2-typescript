@@ -2,10 +2,11 @@ import React, { ComponentProps, useEffect, useRef, useState } from 'react'
 import { Button } from '../../../components/Shared/Button/Button'
 import { useMakeProfile } from '../../../lib/ReactQuery'
 import { useUserContext } from '../../../context/UserContext'
-import { redirect, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { CSRF } from '../../../components/Shared/CSRFToken/CSRFToken'
 
 export const MakeProfile:React.FC<ComponentProps<'section'>> = () => {
-  const {isLoading, hasProfile, checkUser, isAuthenticated} = useUserContext()
+  const {isLoading, hasProfile, checkUser, isAuthenticated, emailVerified} = useUserContext()
   const navigate = useNavigate()
   const {mutateAsync:makeProfile} = useMakeProfile()
   const [profileState, setProfileState] = useState<{userName:string, bio:string, mention:string}>({userName:'', mention:'', bio:''})
@@ -19,6 +20,10 @@ export const MakeProfile:React.FC<ComponentProps<'section'>> = () => {
    if(!isAuthenticated && !isLoading) navigate('/auth/login')
    if(hasProfile && !isLoading) navigate('/')
   },[isAuthenticated, isLoading, hasProfile])
+
+  useEffect(() => {
+    if(emailVerified === false) return navigate('/auth/please-verify')
+  },[emailVerified])
 
   function handleSumbilt(){
     if (bioRef.current)
@@ -35,6 +40,7 @@ export const MakeProfile:React.FC<ComponentProps<'section'>> = () => {
 
   return (
     <section>
+      <CSRF/>
       {currentIndex === 0 &&
       <div>
         <div className='flex flex-col gap-4'>

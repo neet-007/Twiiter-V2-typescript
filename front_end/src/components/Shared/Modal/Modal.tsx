@@ -11,7 +11,7 @@ export const Modal:React.FC<ModalInterface> = ({isOpen, allClassName, className,
   return createPortal(
     <div className={` ${allClassName}`}>
         <div id='modal-overlay' className=' fixed inset-0 bg-[rgba(0,0,0,0.75)]'></div>
-        <div className={` absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-5 bg-slate-400  ${className}`}>
+        <div className={` fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-5 bg-slate-400  ${className}`}>
             {children}
         </div>
     </div>

@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, ValidationError, SerializerMethodField, ListField, CharField
 from user_auth.serializers import UserProfileSerlializer
 from user_auth.models import UserProfile
-from .models import Tweet, Bookmark, Like
+from .models import Tweet, Bookmark, Like, Tag
 
 class UsersMentiondSerializer(ModelSerializer):
     class Meta:
@@ -98,3 +98,8 @@ class LikeSerializer(ModelSerializer):
     def validate(self, attrs):
         attrs['user'] = self.context.get('user')
         return super().validate(attrs)
+
+class TagSerializer(ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'

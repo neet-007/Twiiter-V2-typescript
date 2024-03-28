@@ -4,20 +4,20 @@ import { Button } from '../../../components/Shared/Button/Button'
 import { useNavigate } from 'react-router-dom'
 import { CSRF } from '../../../components/Shared/CSRFToken/CSRFToken'
 import { useUserContext } from '../../../context/UserContext'
-import { getCheckUser } from '../../../lib/Axios'
 
 export const Login:React.FC<ComponentProps<'section'>> = () => {
-   const {isAuthenticated} = useUserContext()
-   const {mutateAsync:login, data} = useLogin()
+   const {hasProfile, emailVerified, isAuthenticated} = useUserContext()
+   const {mutateAsync:login} = useLogin()
    const emailRef = useRef<HTMLInputElement>(null)
    const passwordRef = useRef<HTMLInputElement>(null)
 
    const navigate = useNavigate()
 
    useEffect(() => {
-       if(isAuthenticated) navigate('/')
-       if(data?.success) navigate('/')
-   },[isAuthenticated, data])
+       if(hasProfile) navigate('/')
+       if(emailVerified) navigate('/auth/make-profile')
+       if(isAuthenticated) navigate('/auth/reverify')
+   },[hasProfile, emailVerified, isAuthenticated])
 
    function handleSubmit(e:React.FormEvent<HTMLFormElement>){
         e.preventDefault()

@@ -1,3 +1,4 @@
+import React, { useState } from "react"
 import { Route, Routes } from "react-router-dom"
 import { SideNav } from "./components/SideNav/SideNav"
 import { MainPage } from "./pages/MainPage/MainPage"
@@ -13,9 +14,12 @@ import { PostPage } from "./pages/PostPage/PostPage"
 import { ListDetails } from "./pages/ListPage/ListDetails"
 import { SearchBar } from "./components/SearchBar/SearchBar"
 import { SideNav as MobileSideNav } from "./components/Mobile/SideNav"
-import React, { useState } from "react"
 import { Header } from "./components/Mobile/Header"
 import { BookmarkPage } from "./pages/BookmarkPage/BookmarkPage"
+import { EmailVerification } from "./pages/Auth/EmailVerification/EmailVerification"
+import { MainPagesLayout } from "./pages/MainPagesLayout"
+import { Revirifaction } from "./pages/Auth/EmailVerification/Revirifaction"
+import { PleaseVerify } from "./pages/Auth/EmailVerification/PleaseVerify"
 function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false)
 
@@ -31,17 +35,22 @@ function App() {
       <SideNav className="fixed hidden sm:flex"/>
       <main className="h-dvh relative ml-[0%] sm:ml-[20%] w-full lg:w-[50%]">
         <Routes>
-          <Route path="" element={<MainPage/>}/>
-          <Route path="search" element={<SearchPage/>}/>
-          <Route path="notification" element={<NotificationsPage/>}/>
-          <Route path="profile/:userMention" element={<UserDetailsPage/>}/>
-          <Route path="lists" element={<ListPage/>}/>
-          <Route path="bookmarks" element={<BookmarkPage/>}/>
-          <Route path="list/:listId" element={<ListDetails/>}/>
-          <Route path="post/:tweetId" element={<PostPage/>}/>
+          <Route element={<MainPagesLayout/>}>
+            <Route path="" element={<MainPage/>}/>
+            <Route path="search" element={<SearchPage/>}/>
+            <Route path="notification" element={<NotificationsPage/>}/>
+            <Route path="profile/:userMention" element={<UserDetailsPage/>}/>
+            <Route path="lists" element={<ListPage/>}/>
+            <Route path="bookmarks" element={<BookmarkPage/>}/>
+            <Route path="list/:listId" element={<ListDetails/>}/>
+            <Route path="post/:tweetId" element={<PostPage/>}/>
+          </Route>
             <Route path="auth/register" element={<Register/>}/>
             <Route path="auth/login" element={<Login/>}/>
             <Route path="auth/make-profile" element={<MakeProfile/>}/>
+            <Route path="auth/verification/:tokenId" element={<EmailVerification/>}/>
+            <Route path="auth/reverify" element={<Revirifaction/>}/>
+            <Route path="auth/please-verify" element={<PleaseVerify/>}/>
         </Routes>
         <BottomBar className=" flex sm:hidden"/>
       </main>

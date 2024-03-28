@@ -3,11 +3,12 @@ import { Button } from "../Shared/Button/Button"
 import { UserIcon } from "../Shared/UserIcon/UserIcon"
 import { useUserContext } from "../../context/UserContext"
 import { Link } from "react-router-dom"
-import { ArrowLeft, Bell, Bookmark, HouseDoor, JournalText, Person, Search, TwitterX } from "react-bootstrap-icons"
+import { ArrowLeft, Bell, Bookmark, BoxArrowLeft, HouseDoor, JournalText, Person, Search, TwitterX } from "react-bootstrap-icons"
 import { Modal } from "../Shared/Modal/Modal"
 import { modalClick } from "../../utils/modalClick"
 import { TweetInput } from "../Shared/TweetInput/TweetInput"
-
+import { logout } from "../../lib/Axios"
+ 
 export const SideNav:React.FC<ComponentProps<'nav'>> = ({className, ...props}) => {
   const {user} = useUserContext()
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -66,6 +67,14 @@ export const SideNav:React.FC<ComponentProps<'nav'>> = ({className, ...props}) =
                   bookmark
                 </p>
               </Link>
+            </li>
+            <li>
+              <button onClick={() => logout()} className=" p-2 flex gap-2 items-center" >
+                <BoxArrowLeft size={20}/>
+                <p>
+                  logout
+                </p>
+              </button>
             </li>
             <Button className="p-0 px-0 py-0 rounded-full h-[3rem] w-[3rem] md:px-4 md:py-2 md:w-full md:h-fit"
             onClick={() => setIsOpen(true)}>

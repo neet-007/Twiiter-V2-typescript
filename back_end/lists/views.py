@@ -1,6 +1,6 @@
+from django.core.paginator import Paginator
 from django.contrib.auth.models import AnonymousUser
 from rest_framework import status
-from django.core.paginator import Paginator
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
@@ -29,6 +29,10 @@ class ListViewset(ModelViewSet):
     @action(methods=['get'], detail=False)
     def user_lists(self, request):
         page = request.GET.get('page', 1)
+
+        if isinstance(request.user, AnonymousUser):
+            return Response({'error':'user is not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+
         try:
             user = UserProfile.objects.get(user=request.user)
         except UserProfile.DoesNotExist:

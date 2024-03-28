@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
-import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers, memberList, getUserBookmakrs } from "./Axios";
+import { register, login, logout, Createtweet, makeProfile, GetMainPageTweets, getUserProfile, likeTweet, bookmarkTweet, getPostComments, makePostComment, getSingleTweet, getSingleList, getListTweets, search, following, getMainPageTweets, getUserLists, followList, getListMembers, getListFollowers, memberList, getUserBookmakrs, checkToken, reVerify, searchBar } from "./Axios";
 import { Tweet } from "../components/Shared/TweetCard/TweetCard";
 
 export function useRegister(){
@@ -204,5 +204,25 @@ export function useSearch({q, f, src, page}:{q:string, f?:'live' | 'users' | 'li
 export function useFollowing(){
     return useMutation({
         mutationFn:({follower, unfollow}:{follower:number, unfollow?:boolean}) => following({follower, unfollow})
+    })
+}
+
+export function useReVerify(){
+    return useQuery({
+        queryKey:['reverify'],
+        queryFn:reVerify
+    })
+}
+
+export function useCheckToken(){
+    return useMutation({
+        mutationFn:({token}:{token:string}) => checkToken({token})
+    })
+}
+
+export function useSearchBar(){
+    return useQuery({
+        queryKey:['search-bar'],
+        queryFn:searchBar
     })
 }

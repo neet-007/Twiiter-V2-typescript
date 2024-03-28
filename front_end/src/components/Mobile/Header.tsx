@@ -10,7 +10,9 @@ interface HeaderProps extends ComponentProps<'header'>{
 export const Header:React.FC<HeaderProps> = ({setIsMobileNavOpen, className}) => {
   const {pathname} = useLocation()
   const navigate = useNavigate()
-  if (pathname === '/lists' || pathname === '/bookmarks') return null
+
+  if (pathname === '/lists' || pathname === '/bookmarks' || pathname.includes('auth')) return null
+
   return (
     <div className={`${className} fixed top-0 z-10 w-full h-[2rem] md:hidden bg-white bg-opacity-75'`}>
         <div className='flex justify-between'>

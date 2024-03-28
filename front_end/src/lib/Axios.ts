@@ -288,3 +288,33 @@ export async function following({follower, unfollow}:{follower:number, unfollow?
         console.log(error)
     }
 }
+
+export async function reVerify(){
+    try {
+        let res = await axios.get('/api/auth/reverify')
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function checkToken({token}:{token:string}){
+    try {
+        let res = await axios.post('/api/auth/check-token', {token_:token}, config)
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function searchBar(){
+    try {
+        let res = await axios.get('/api/tweets/tweet/trending')
+        console.log(res)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}

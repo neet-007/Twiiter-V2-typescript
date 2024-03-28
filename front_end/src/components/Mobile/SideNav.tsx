@@ -2,11 +2,12 @@ import React, { ComponentProps } from 'react'
 import { Bookmark, BoxArrowLeft, Gear, JournalText, Person, Plus } from 'react-bootstrap-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { useUserContext } from '../../context/UserContext'
+import { logout } from '../../lib/Axios'
 
 interface SideNavProps extends ComponentProps<'div'>{
     isOpen:boolean
 }
-
+ 
 export const SideNav:React.FC<SideNavProps> = ({isOpen}) => {
   const {user} = useUserContext()
   const navigate = useNavigate()
@@ -69,12 +70,12 @@ export const SideNav:React.FC<SideNavProps> = ({isOpen}) => {
                     </Link>
                 </li>
                 <li>
-                    <div className=' flex items-center px-2 py-4 gap-2'>
+                    <button className=' flex items-center px-2 py-4 gap-2' onClick={() => logout()}>
                         <BoxArrowLeft size={20}/>
                         <p>
                             logout
                         </p>
-                    </div>
+                    </button>
                 </li>
             </ul>
         </nav>
